@@ -66,9 +66,10 @@ jobs:
             --exclude='.refactor' \
             --exclude='.claude' \
             --exclude='tests' \
-            --exclude='vendor' \
+            --exclude='/vendor' \
             --exclude='node_modules' \
-            --exclude='build' \
+            --exclude='/build' \
+            --exclude='.DS_Store' \
             --exclude='composer.json' \
             --exclude='phpunit.xml' \
             ./ build/megamundo-logistica/
