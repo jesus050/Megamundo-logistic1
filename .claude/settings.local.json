@@ -17,7 +17,11 @@
       "Bash(git commit --quiet -m 'Quick fixes: AJAX duplicado, CSS condicionado, Container sin fallback, borrar legacy/ *)",
       "Bash(docker --version)",
       "Bash(python3 .refactor/extract_traits.py)",
-      "Bash(git commit --quiet -m 'Partir ScannerViewController \\(6,759 líneas\\) en 18 traits por dominio *)"
+      "Bash(git commit --quiet -m 'Partir ScannerViewController \\(6,759 líneas\\) en 18 traits por dominio *)",
+      "Bash(git commit --quiet -m 'Infraestructura de tests: Composer, PHPUnit, CI en GitHub Actions *)",
+      "Bash(sed -n '/public function ajax_guardar_bodega_receipt\\(\\)/,/^    }/p' src/Presentation/Front/Concerns/BodegaTrait.php)",
+      "Bash(sed -n '/private function ajax_guardar_bodega_receipt_no_exit\\(\\)/,/^    }/p' src/Presentation/Front/Concerns/BodegaTrait.php)",
+      "Bash(git commit --quiet -m 'Actualizar permisos locales de Claude Code acumulados en la sesión *)"
     ]
   }
 }
