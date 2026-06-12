@@ -1,0 +1,235 @@
+
+/* MegaMundo Logística - UI Premium forzada v4.7.1 */
+:root{
+  --mm-bg:#f4f7fb;
+  --mm-card:rgba(255,255,255,.92);
+  --mm-border:rgba(148,163,184,.22);
+  --mm-text:#0f172a;
+  --mm-muted:#64748b;
+  --mm-blue:#0ea5e9;
+  --mm-indigo:#6366f1;
+  --mm-purple:#7c3aed;
+  --mm-shadow:0 22px 60px rgba(15,23,42,.10);
+  --mm-radius:26px;
+}
+
+html body{
+  background:var(--mm-bg)!important;
+}
+
+.mm-platform,
+.mm-logistica-app,
+.mm-app-shell{
+  min-height:100vh!important;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(124,58,237,.16), transparent 34rem),
+    radial-gradient(circle at 10% 10%, rgba(14,165,233,.14), transparent 28rem),
+    linear-gradient(180deg,#f8fbff 0%,#eef4fb 100%)!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  color:var(--mm-text)!important;
+}
+
+.mm-sidebar,
+.mm-platform-sidebar,
+.mm-app-sidebar,
+.mm-layout-sidebar{
+  background:linear-gradient(180deg,#101827 0%,#1e293b 55%,#0f172a 100%)!important;
+  box-shadow:14px 0 40px rgba(15,23,42,.14)!important;
+}
+
+.mm-sidebar a,
+.mm-platform-sidebar a,
+.mm-app-sidebar a,
+.mm-layout-sidebar a{
+  border-radius:16px!important;
+  font-weight:900!important;
+  transition:.18s ease!important;
+}
+
+.mm-sidebar a:hover,
+.mm-platform-sidebar a:hover,
+.mm-app-sidebar a:hover{
+  transform:translateX(3px)!important;
+  background:rgba(255,255,255,.08)!important;
+}
+
+.mm-sidebar a.is-active,
+.mm-platform-sidebar a.is-active,
+.mm-app-sidebar a.is-active,
+.mm-layout-sidebar a.is-active{
+  background:linear-gradient(135deg,var(--mm-blue),var(--mm-indigo),var(--mm-purple))!important;
+  color:#fff!important;
+  box-shadow:0 14px 32px rgba(99,102,241,.30)!important;
+}
+
+.mm-platform-main,
+main.mm-platform-main,
+.mm-main,
+.mm-content{
+  padding:42px 44px!important;
+  background:
+    radial-gradient(circle at top right, rgba(99,102,241,.12), transparent 38rem),
+    radial-gradient(circle at top left, rgba(14,165,233,.10), transparent 30rem),
+    #f4f7fb!important;
+}
+
+.mm-dashboard-hero,
+.mm-hero,
+.mm-page-hero{
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255,255,255,.20), transparent 18rem),
+    linear-gradient(135deg,#0f172a 0%,#1e3a8a 48%,#5b21b6 100%)!important;
+  color:white!important;
+  border-radius:32px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:0 28px 80px rgba(30,64,175,.22)!important;
+  padding:36px!important;
+}
+
+.mm-dashboard-hero h1,
+.mm-hero h1,
+.mm-page-hero h1{
+  color:white!important;
+  font-size:clamp(32px,4vw,58px)!important;
+  letter-spacing:-.05em!important;
+  margin:8px 0!important;
+}
+
+.mm-dashboard-hero p,
+.mm-hero p,
+.mm-page-hero p{
+  color:rgba(255,255,255,.82)!important;
+}
+
+.mm-platform-section,
+.mm-scan-card,
+.mm-card,
+.mm-panel,
+.mm-bodega-card{
+  background:var(--mm-card)!important;
+  border:1px solid var(--mm-border)!important;
+  border-radius:var(--mm-radius)!important;
+  box-shadow:var(--mm-shadow)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
+
+.mm-platform-section{
+  padding:24px!important;
+  margin-bottom:24px!important;
+}
+
+.mm-section-head h2,
+.mm-platform-section h2,
+.mm-scan-card h2{
+  color:var(--mm-text)!important;
+  letter-spacing:-.035em!important;
+  font-size:clamp(22px,2.4vw,34px)!important;
+}
+
+.mm-section-head span,
+.mm-platform-section p,
+.mm-scan-card p{
+  color:var(--mm-muted)!important;
+  font-weight:750!important;
+}
+
+.mm-input,
+.mm-platform input[type="text"],
+.mm-platform input[type="number"],
+.mm-platform input[type="date"],
+.mm-platform input[type="email"],
+.mm-platform select,
+.mm-platform textarea,
+.mm-logistica-app input[type="text"],
+.mm-logistica-app input[type="number"],
+.mm-logistica-app select,
+.mm-logistica-app textarea{
+  background:rgba(255,255,255,.96)!important;
+  border:1px solid rgba(148,163,184,.28)!important;
+  border-radius:16px!important;
+  min-height:52px!important;
+  color:var(--mm-text)!important;
+  font-weight:750!important;
+  box-shadow:0 8px 20px rgba(15,23,42,.04)!important;
+}
+
+.mm-input:focus,
+.mm-platform input:focus,
+.mm-platform select:focus,
+.mm-platform textarea:focus{
+  border-color:rgba(99,102,241,.72)!important;
+  box-shadow:0 0 0 4px rgba(99,102,241,.14),0 12px 28px rgba(15,23,42,.08)!important;
+  outline:none!important;
+}
+
+.mm-mini-primary,
+.mm-primary-btn,
+.mm-platform button[type="submit"],
+.mm-logistica-app button[type="submit"],
+.mm-platform .button-primary{
+  border:0!important;
+  border-radius:16px!important;
+  background:linear-gradient(135deg,var(--mm-blue),var(--mm-indigo),var(--mm-purple))!important;
+  color:#fff!important;
+  font-weight:950!important;
+  min-height:48px!important;
+  padding:12px 18px!important;
+  box-shadow:0 16px 34px rgba(99,102,241,.28)!important;
+}
+
+.mm-mini-secondary,
+.mm-secondary-btn,
+.mm-platform .button{
+  border:1px solid rgba(148,163,184,.25)!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.92)!important;
+  color:#0f172a!important;
+  font-weight:900!important;
+  min-height:46px!important;
+  padding:11px 16px!important;
+  box-shadow:0 10px 24px rgba(15,23,42,.06)!important;
+}
+
+.mm-platform table,
+.mm-logistica-app table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  background:rgba(255,255,255,.86)!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+}
+
+.mm-platform th,
+.mm-logistica-app th{
+  background:#eef4fb!important;
+  color:#64748b!important;
+  font-size:11px!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+  font-weight:950!important;
+}
+
+.mm-upload-box,
+.mm-photo-box,
+.mm-image-picker,
+.mm-camera-box{
+  border:2px dashed rgba(59,130,246,.32)!important;
+  background:linear-gradient(180deg,rgba(239,246,255,.92),rgba(255,255,255,.72))!important;
+  border-radius:24px!important;
+}
+
+.mm-error,
+.mm-alert-error,
+.notice-error{
+  background:#fef2f2!important;
+  border:1px solid #fecaca!important;
+  color:#991b1b!important;
+  border-radius:18px!important;
+  padding:14px!important;
+  overflow-wrap:anywhere!important;
+}
+
+@media(max-width:900px){
+  .mm-platform-main, main.mm-platform-main{padding:22px 16px!important}
+}

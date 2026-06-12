@@ -1,0 +1,778 @@
+/* Estilos administrativos para MegaMundo Logística CPT Lotes */
+
+.mm-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.mm-summary-card {
+    background: #ffffff;
+    border: 1px solid #ccd0d4;
+    border-left: 4px solid #007cba;
+    border-radius: 4px;
+    padding: 12px 15px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.mm-summary-card.mm-financial {
+    border-left-color: #23282d;
+}
+
+.mm-summary-card.mm-highlight {
+    border-left-color: #46b450;
+}
+
+.mm-summary-card h4 {
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #646970;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.mm-summary-card .mm-metric {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1.2;
+}
+
+.mm-actions-bar {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mm-actions-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mm-actions-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mm-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background-color: #e5f4e7;
+    color: #137e28;
+    border: 1px solid #137e28;
+}
+
+.badge-warning {
+    background-color: #fff8e5;
+    color: #b28000;
+    border: 1px solid #b28000;
+}
+
+.badge-danger {
+    background-color: #fcebeb;
+    color: #cc1818;
+    border: 1px solid #cc1818;
+}
+
+.badge-info {
+    background-color: #e5f5fa;
+    color: #007cba;
+    border: 1px solid #007cba;
+}
+
+.badge-secondary {
+    background-color: #f0f0f1;
+    color: #50575e;
+    border: 1px solid #8c8f94;
+}
+
+.mm-table-search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mm-search-input {
+    min-width: 250px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.mm-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mm-pagination-info {
+    font-size: 13px;
+    color: #646970;
+}
+
+.mm-table-container {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#mm-lote-items-table {
+    margin: 0;
+    border: none;
+}
+
+#mm-lote-items-table th {
+    background: #f6f7f7;
+    font-weight: 700;
+    color: #1d2327;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+#mm-lote-items-table td {
+    vertical-align: middle;
+}
+
+.mm-input-inline {
+    width: 90px;
+    padding: 4px 8px;
+    margin: 0;
+    font-size: 13px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+}
+
+.mm-input-inline:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.mm-input-inline:disabled {
+    background-color: #f0f0f1;
+    color: #646970;
+    border-color: #dcdcde;
+    cursor: not-allowed;
+}
+
+.mm-status-notice {
+    padding: 12px 15px;
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mm-status-notice.notice-cargado {
+    background-color: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+}
+
+/* Auditoría / Bitácora */
+.mm-audit-timeline {
+    margin-top: 5px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.mm-audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 0;
+}
+
+.mm-audit-table th {
+    background: #f6f7f7;
+    font-weight: 700;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #ccd0d4;
+    color: #1d2327;
+}
+
+.mm-audit-table td {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f1;
+    vertical-align: top;
+    color: #2c3338;
+}
+
+.mm-audit-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.mm-audit-action-badge {
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1;
+    border: 1px solid transparent;
+}
+
+.mm-audit-action-lote_creado { background: #e2f0fd; color: #0b69c5; border-color: #9ec5e6; }
+.mm-audit-action-producto_escaneado { background: #f0f0f1; color: #50575e; border-color: #d0d0d1; }
+.mm-audit-action-producto_nuevo_creado { background: #eafbe7; color: #348622; border-color: #b7e3b1; }
+.mm-audit-action-cantidad_modificada { background: #fff4e5; color: #b28000; border-color: #edd39a; }
+.mm-audit-action-costo_modificado { background: #fff4e5; color: #b28000; border-color: #edd39a; }
+.mm-audit-action-precio_modificado { background: #fff4e5; color: #b28000; border-color: #edd39a; }
+.mm-audit-action-conteo_cerrado { background: #fcebeb; color: #cc1818; border-color: #f5c2c2; }
+.mm-audit-action-enviado_a_precios { background: #e2f0fd; color: #0b69c5; border-color: #9ec5e6; }
+.mm-audit-action-enviado_a_aprobacion { background: #e2f0fd; color: #0b69c5; border-color: #9ec5e6; }
+.mm-audit-action-lote_aprobado { background: #eafbe7; color: #348622; border-color: #b7e3b1; }
+.mm-audit-action-sync_iniciada { background: #f5e2ff; color: #7f0bca; border-color: #e2b9f7; }
+.mm-audit-action-sync_producto_ok { background: #eafbe7; color: #348622; border-color: #b7e3b1; }
+.mm-audit-action-sync_producto_error { background: #fcebeb; color: #cc1818; border-color: #f5c2c2; }
+.mm-audit-action-etiquetas_impresas { background: #f0f0f1; color: #50575e; border-color: #d0d0d1; }
+.mm-audit-action-csv_exportado { background: #f0f0f1; color: #50575e; border-color: #d0d0d1; }
+.mm-audit-action-ajuste_manual { background: #fff4e5; color: #b28000; border-color: #edd39a; }
+.mm-audit-action-comentario_agregado { background: #e2f0fd; color: #0b69c5; border-color: #9ec5e6; }
+.mm-audit-action-checklist_actualizado { background: #eafbe7; color: #348622; border-color: #b7e3b1; }
+
+/* =========================================================================
+   COMENTARIOS INTERNOS
+   ========================================================================= */
+
+.mm-comments-form {
+    padding: 12px;
+    background: #f9f9f9;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.mm-comment-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    resize: vertical;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.mm-comment-textarea:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.mm-comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.mm-comment-status-msg {
+    font-size: 13px;
+    font-style: italic;
+}
+
+.mm-comments-list {
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.mm-comment-item {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f1;
+    background: #fff;
+}
+
+.mm-comment-item:last-child {
+    border-bottom: none;
+}
+
+.mm-comment-item:hover {
+    background: #f9f9f9;
+}
+
+.mm-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+}
+
+.mm-comment-author {
+    font-weight: 600;
+    font-size: 12px;
+    color: #2271b1;
+}
+
+.mm-comment-date {
+    font-size: 11px;
+    color: #8c8f94;
+}
+
+.mm-comment-body {
+    font-size: 13px;
+    color: #2c3338;
+    line-height: 1.6;
+}
+
+.mm-comments-empty {
+    color: #646970;
+    font-style: italic;
+    padding: 10px;
+    margin: 0;
+    font-size: 13px;
+}
+
+/* =========================================================================
+   CHECKLIST OPERATIVO
+   ========================================================================= */
+
+.mm-checklist-locked {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #856404;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+.mm-checklist-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.mm-checklist-item {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    transition: background 0.15s ease;
+}
+
+.mm-checklist-item label {
+    cursor: pointer;
+    font-size: 13px;
+    color: #2c3338;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    width: 100%;
+    font-weight: normal;
+}
+
+.mm-checklist-item input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.mm-checklist-item.mm-checklist-checked {
+    background: #eafbe7;
+    border-color: #b7e3b1;
+}
+
+.mm-checklist-item.mm-checklist-checked label {
+    color: #1a5e0d;
+    font-weight: 600;
+}
+
+.mm-checklist-item.mm-checklist-readonly {
+    opacity: 0.55;
+    background: #f6f7f7;
+    border-color: #dcdcde;
+}
+
+.mm-checklist-item.mm-checklist-readonly label {
+    cursor: not-allowed;
+    color: #646970;
+}
+
+.mm-checklist-msg {
+    font-size: 12px;
+    font-style: italic;
+    min-height: 18px;
+    padding: 2px 0;
+}
+
+/* === MegaMundo Logística — Platform Admin UI Upgrade === */
+.post-type-lotes_ingreso #wpcontent {
+    background: #eef3f8;
+}
+
+.post-type-lotes_ingreso #poststuff,
+.post-type-lotes_ingreso #post-body-content,
+.post-type-lotes_ingreso #postbox-container-2 {
+    color: #0f172a;
+}
+
+.post-type-lotes_ingreso .wrap h1.wp-heading-inline,
+.post-type-lotes_ingreso .wrap > h1 {
+    font-size: 34px;
+    letter-spacing: -0.04em;
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.post-type-lotes_ingreso .postbox {
+    border: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, .09);
+    background: #fff;
+}
+
+.post-type-lotes_ingreso .postbox .postbox-header {
+    background: linear-gradient(135deg, #07192f, #0f4c81);
+    border-bottom: 0;
+    color: #fff;
+    padding: 4px 8px;
+}
+
+.post-type-lotes_ingreso .postbox .hndle,
+.post-type-lotes_ingreso .postbox .handlediv,
+.post-type-lotes_ingreso .postbox .toggle-indicator {
+    color: #fff !important;
+}
+
+.post-type-lotes_ingreso .postbox .inside {
+    padding: 22px !important;
+    margin: 0 !important;
+}
+
+.post-type-lotes_ingreso #submitdiv .postbox-header {
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+}
+
+.mm-summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.mm-summary-card {
+    border: 1px solid rgba(15, 23, 42, .08) !important;
+    border-left: 0 !important;
+    border-radius: 20px !important;
+    padding: 18px !important;
+    box-shadow: 0 12px 28px rgba(15,23,42,.06) !important;
+    background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.mm-summary-card:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0f4c81, #42a5f5);
+}
+
+.mm-summary-card.mm-financial:before { background: linear-gradient(90deg, #ffb703, #fb8500); }
+.mm-summary-card.mm-highlight:before { background: linear-gradient(90deg, #16a34a, #86efac); }
+
+.mm-summary-card h4 {
+    color: #64748b !important;
+    font-weight: 900 !important;
+    letter-spacing: .08em !important;
+    font-size: 11px !important;
+}
+
+.mm-summary-card .mm-metric {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    letter-spacing: -.03em;
+    color: #0f172a !important;
+}
+
+.mm-actions-bar {
+    border: 1px solid rgba(15,23,42,.08) !important;
+    border-radius: 20px !important;
+    padding: 16px !important;
+    box-shadow: 0 12px 28px rgba(15,23,42,.05);
+    background: #fff !important;
+}
+
+.mm-actions-bar .button,
+.post-type-lotes_ingreso .button.button-primary,
+.post-type-lotes_ingreso .button.button-secondary {
+    border-radius: 14px !important;
+    min-height: 40px;
+    padding: 6px 14px !important;
+    font-weight: 800 !important;
+    border-width: 1px !important;
+}
+
+.post-type-lotes_ingreso .button.button-primary {
+    background: #0f4c81 !important;
+    border-color: #0f4c81 !important;
+    color: #fff !important;
+}
+
+.mm-badge {
+    border-radius: 999px !important;
+    padding: 6px 10px !important;
+    font-size: 10px !important;
+    letter-spacing: .05em;
+    white-space: nowrap;
+}
+
+.badge-success { background: #dcfce7 !important; color: #166534 !important; border-color: rgba(22,101,52,.16) !important; }
+.badge-warning { background: #fef3c7 !important; color: #92400e !important; border-color: rgba(146,64,14,.16) !important; }
+.badge-danger { background: #fee2e2 !important; color: #991b1b !important; border-color: rgba(153,27,27,.16) !important; }
+.badge-info { background: #dbeafe !important; color: #1e40af !important; border-color: rgba(30,64,175,.16) !important; }
+.badge-secondary { background: #f1f5f9 !important; color: #475569 !important; border-color: rgba(71,85,105,.16) !important; }
+
+.mm-table-search-bar {
+    background: #fff;
+    border: 1px solid rgba(15,23,42,.08);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 12px 28px rgba(15,23,42,.04);
+}
+
+.mm-search-input {
+    border-radius: 14px !important;
+    border: 1px solid rgba(15,23,42,.12) !important;
+    min-height: 40px;
+    min-width: min(420px, 100%) !important;
+}
+
+.mm-table-container {
+    border: 1px solid rgba(15,23,42,.08) !important;
+    border-radius: 20px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    box-shadow: 0 18px 50px rgba(15,23,42,.07);
+    background: #fff;
+}
+
+#mm-lote-items-table {
+    min-width: 1320px;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+#mm-lote-items-table th {
+    background: #f8fafc !important;
+    color: #334155 !important;
+    font-size: 11px !important;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 14px 10px !important;
+    border-bottom: 1px solid rgba(15,23,42,.08) !important;
+}
+
+#mm-lote-items-table td {
+    padding: 13px 10px !important;
+    vertical-align: top !important;
+    border-bottom: 1px solid rgba(15,23,42,.06) !important;
+    color: #0f172a;
+    word-break: normal !important;
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+}
+
+#mm-lote-items-table td:nth-child(1) { width: 58px; }
+#mm-lote-items-table td:nth-child(2) { width: 130px; font-weight: 900; color: #0f4c81; }
+#mm-lote-items-table td:nth-child(3) { width: 320px; min-width: 320px; overflow-wrap: break-word !important; }
+#mm-lote-items-table td:nth-child(4) { width: 160px; }
+#mm-lote-items-table td:nth-child(5) { width: 90px; text-align: center; font-size: 18px; }
+
+#mm-lote-items-table a {
+    color: #0f4c81;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+#mm-lote-items-table a:hover { text-decoration: underline; }
+
+.mm-input-inline {
+    border-radius: 12px !important;
+    border: 1px solid rgba(15,23,42,.15) !important;
+    min-height: 36px;
+    width: 96px !important;
+    background: #fff !important;
+}
+
+.mm-status-notice,
+.mm-checklist-locked {
+    border-radius: 18px !important;
+    border-left: 0 !important;
+    border: 1px solid rgba(217,119,6,.18) !important;
+    background: #fffbeb !important;
+    color: #92400e !important;
+    box-shadow: 0 10px 20px rgba(217,119,6,.05);
+}
+
+.mm-status-notice.notice-cargado {
+    background: #dcfce7 !important;
+    border-color: rgba(22,101,52,.16) !important;
+    color: #166534 !important;
+}
+
+.mm-audit-timeline,
+.mm-comments-list,
+.mm-checklist-list {
+    border-radius: 18px !important;
+    border: 1px solid rgba(15,23,42,.08) !important;
+    background: #fff !important;
+    box-shadow: 0 12px 28px rgba(15,23,42,.04);
+}
+
+.mm-audit-table th {
+    background: #f8fafc !important;
+    color: #334155 !important;
+}
+
+.mm-comment-item,
+.mm-checklist-item {
+    border-radius: 16px !important;
+    border: 1px solid rgba(15,23,42,.08) !important;
+    background: #f8fafc !important;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 1200px) {
+    .post-type-lotes_ingreso #post-body.columns-2 #postbox-container-1,
+    .post-type-lotes_ingreso #post-body.columns-2 #postbox-container-2 {
+        float: none;
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+
+/* ==========================================================
+   MegaMundo Logística Admin — Premium UI v4.1
+   ========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --mm-admin-font: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mm-admin-border: hsl(220 30% 88% / .86);
+  --mm-admin-text: hsl(222 47% 11%);
+  --mm-admin-muted: hsl(215 18% 43%);
+  --mm-admin-primary: hsl(222 90% 56%);
+  --mm-admin-primary-2: hsl(202 92% 50%);
+  --mm-admin-shadow: 0 18px 50px hsl(222 47% 11% / .12);
+  --mm-admin-gradient: linear-gradient(135deg, var(--mm-admin-primary) 0%, var(--mm-admin-primary-2) 100%);
+}
+
+.wrap[class*="mm"],
+.mm-admin-wrap,
+.megamundo-logistica-admin,
+.mm-admin-page {
+  font-family: var(--mm-admin-font) !important;
+  color: var(--mm-admin-text);
+}
+
+.mm-admin-wrap h1,
+.megamundo-logistica-admin h1,
+.wrap[class*="mm"] h1 {
+  font-weight: 900 !important;
+  letter-spacing: -.045em;
+  color: var(--mm-admin-text);
+}
+
+.mm-admin-card,
+.mm-admin-panel,
+.mm-admin-box,
+.postbox:has(.mm-admin-card),
+.wrap[class*="mm"] .postbox {
+  border: 1px solid var(--mm-admin-border) !important;
+  border-radius: 24px !important;
+  background: hsl(0 0% 100% / .86) !important;
+  box-shadow: var(--mm-admin-shadow) !important;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.wp-core-ui .button-primary,
+.mm-admin-wrap .button-primary,
+.megamundo-logistica-admin .button-primary {
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: var(--mm-admin-gradient) !important;
+  color: white !important;
+  font-weight: 900 !important;
+  box-shadow: 0 12px 28px hsl(222 90% 56% / .26) !important;
+}
+
+.mm-admin-wrap .button,
+.megamundo-logistica-admin .button,
+.wrap[class*="mm"] .button {
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+}
+
+.mm-admin-wrap input,
+.mm-admin-wrap select,
+.mm-admin-wrap textarea,
+.megamundo-logistica-admin input,
+.megamundo-logistica-admin select,
+.megamundo-logistica-admin textarea {
+  border-radius: 12px !important;
+  border-color: var(--mm-admin-border) !important;
+  box-shadow: 0 6px 18px hsl(222 47% 11% / .04) !important;
+}
+
+.mm-admin-wrap input:focus,
+.mm-admin-wrap select:focus,
+.mm-admin-wrap textarea:focus {
+  border-color: hsl(222 90% 56% / .60) !important;
+  box-shadow: 0 0 0 4px hsl(222 90% 56% / .12) !important;
+}
+
+.mm-admin-wrap th,
+.megamundo-logistica-admin th {
+  background: hsl(220 40% 96%) !important;
+  color: var(--mm-admin-muted) !important;
+  font-weight: 900 !important;
+  letter-spacing: .04em;
+}
+
+
+/* Preserved functional styles */

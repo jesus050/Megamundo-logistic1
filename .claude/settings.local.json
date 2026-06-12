@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '!seen[$NF]++')",
+      "Bash(grep -n 'wpdb\\\\|prepare\\\\|$wpdb' /Users/jesusdiaz/Documents/megamundo-logistica/src/Domain/Lote/LoteRepository.php)",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Baseline v4.7.4 antes del refactoring de Fase 1 *)"
+    ]
+  }
+}
