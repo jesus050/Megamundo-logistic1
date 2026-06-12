@@ -7,7 +7,17 @@
       "mcp__visualize__show_widget",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git commit -m 'Baseline v4.7.4 antes del refactoring de Fase 1 *)"
+      "Bash(git commit -m 'Baseline v4.7.4 antes del refactoring de Fase 1 *)",
+      "Bash(git checkout *)",
+      "Bash(php -v)",
+      "Bash(composer --version)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(brew --version)",
+      "Bash(git rm *)",
+      "Bash(git commit --quiet -m 'Quick fixes: AJAX duplicado, CSS condicionado, Container sin fallback, borrar legacy/ *)",
+      "Bash(docker --version)",
+      "Bash(python3 .refactor/extract_traits.py)",
+      "Bash(git commit --quiet -m 'Partir ScannerViewController \\(6,759 líneas\\) en 18 traits por dominio *)"
     ]
   }
 }

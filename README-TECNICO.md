@@ -249,3 +249,26 @@ Antes de entregar a producción, verifique:
   4. Subir la versión `2.0.0` del plugin.
   5. Activar y verificar la inyección de stock de prueba inicial.
   6. Desactivar modo mantenimiento.
+
+---
+
+## R. Flujo de Desarrollo (desde Fase 1 de refactoring, junio 2026)
+
+### Estructura de la capa de presentación frontend
+`ScannerViewController` actúa como shell de la app (routing por `?mm_logistica_app=`, sidebar, login, dispatch por rol). La lógica de cada dominio vive en traits bajo `src/Presentation/Front/Concerns/`:
+
+| Trait | Dominio |
+|---|---|
+| `FacturasTrait` | Carga, análisis IA y gestión de facturas de lote |
+| `PedidosTrait` | Pedidos de compra y creación de lotes desde pedido |
+| `BodegaTrait` | Recepción, validación y paneles de bodega |
+| `PreciosTrait` | Precios simples y múltiples, envío a aprobación |
+| `ExhibicionTrait`, `EtiquetasTrait`, `JefaturaTrait`, `MekanoTrait`, `ConfigIaTrait`, `NotificacionesTrait`, `ReportesTrait`, `SincronizacionTrait`, `HistorialTrait`, `UsuariosTrait`, `SistemaTrait`, `ProductosNuevosTrait`, `ProductosSinImagenTrait`, `LoteDetailTrait` | Un dominio por trait |
+
+Los traits son el paso intermedio: cada uno define la frontera de un futuro controlador con servicios inyectados. Al graduar un trait a controlador, hacerlo de a uno por PR con el CI en verde.
+
+### Tests y CI
+- `composer install` instala PHPUnit (requiere PHP >= 7.4 en la máquina de desarrollo).
+- `composer test` ejecuta la suite unitaria (`tests/Unit/`, con shims de WordPress en `tests/bootstrap.php` — no requiere WordPress).
+- `composer lint` valida sintaxis de todos los archivos PHP.
+- GitHub Actions (`.github/workflows/ci.yml`) ejecuta lint en PHP 7.4 y 8.2 + PHPUnit en cada push y pull request.

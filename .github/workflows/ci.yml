@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    name: Sintaxis PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: php -l en todos los archivos del plugin
+        run: |
+          set -e
+          find src tests megamundo-logistica.php -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l
+
+  test:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --no-progress
+
+      - name: Ejecutar tests
+        run: vendor/bin/phpunit
