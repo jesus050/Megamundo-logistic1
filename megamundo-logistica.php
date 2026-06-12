@@ -64,23 +64,36 @@ function mm_logistica_missing_woocommerce_notice() {
 
 
 /**
- * MegaMundo Premium UI forced load.
+ * MegaMundo Premium UI: solo en páginas del plugin (app standalone, shortcode del escáner o admin de lotes).
  */
 add_action( 'wp_enqueue_scripts', function() {
+    $is_app_page   = isset( $_GET['mm_logistica_app'] );
+    $post          = get_post();
+    $has_shortcode = $post instanceof WP_Post && has_shortcode( $post->post_content, 'mm_escaner_bodega' );
+
+    if ( ! $is_app_page && ! $has_shortcode ) {
+        return;
+    }
+
     wp_enqueue_style(
         'megamundo-premium-ui-force',
         plugin_dir_url( __FILE__ ) . 'assets/css/megamundo-premium-ui-force.css',
         array(),
-        '4.7.1'
+        MM_LOGISTICA_VERSION
     );
 }, 999 );
 
 add_action( 'admin_enqueue_scripts', function() {
+    $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+    if ( ! $screen || 'lotes_ingreso' !== $screen->post_type ) {
+        return;
+    }
+
     wp_enqueue_style(
         'megamundo-premium-ui-force-admin',
         plugin_dir_url( __FILE__ ) . 'assets/css/megamundo-premium-ui-force.css',
         array(),
-        '4.7.1'
+        MM_LOGISTICA_VERSION
     );
 }, 999 );
 

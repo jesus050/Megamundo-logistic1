@@ -24,16 +24,10 @@ class Container {
             return $this->instances[ $id ];
         }
 
-        // Fallback: intentar instanciación directa
-        if ( class_exists( $id ) ) {
-            $this->instances[ $id ] = new $id();
-            return $this->instances[ $id ];
-        }
-
-        throw new \Exception( "Servicio no registrado o encontrado: " . $id );
+        throw new \Exception( "Servicio no registrado: " . $id );
     }
 
     public function has( $id ) {
-        return isset( $this->services[ $id ] ) || isset( $this->instances[ $id ] ) || class_exists( $id );
+        return isset( $this->services[ $id ] ) || isset( $this->instances[ $id ] );
     }
 }

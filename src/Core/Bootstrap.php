@@ -235,14 +235,6 @@ class Bootstrap {
             self::$container->get( MetaboxController::class )->ajax_guardar_checklist();
         } );
 
-        add_action( 'wp_ajax_mm_app_guardar_precios', function() {
-            self::$container->get( ScannerViewController::class )->ajax_guardar_precios_app();
-        } );
-
-        add_action( 'wp_ajax_mm_app_enviar_aprobacion', function() {
-            self::$container->get( ScannerViewController::class )->ajax_enviar_aprobacion_app();
-        } );
-
         // J) Auditoría de cambio de estado
         add_action( 'transition_post_status', function( $new_status, $old_status, $post ) {
             if ( $post->post_type !== 'lotes_ingreso' ) {
