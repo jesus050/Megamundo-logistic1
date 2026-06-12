@@ -387,6 +387,7 @@ trait BodegaTrait {
     }
 
     public function ajax_guardar_bodega_receipt() {
+        if ( ! is_user_logged_in() || ! $this->permission_guard->can_access_bodega_panel() ) { wp_send_json_error(array('message'=>'No tienes permiso para registrar recepción de bodega.'),403); }
         $lote_id = isset($_POST['lote_id']) ? intval($_POST['lote_id']) : 0;
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if ( $lote_id <= 0 || ! wp_verify_nonce( $nonce, 'mm_bodega_receipt_' . $lote_id ) ) { wp_send_json_error(array('message'=>'Sesión vencida o lote inválido.'),403); }
@@ -402,6 +403,7 @@ trait BodegaTrait {
     }
 
     private function ajax_guardar_bodega_receipt_no_exit() {
+        if ( ! is_user_logged_in() || ! $this->permission_guard->can_access_bodega_panel() ) { wp_send_json_error(array('message'=>'No tienes permiso para finalizar bodega.'),403); }
         $lote_id = isset($_POST['lote_id']) ? intval($_POST['lote_id']) : 0;
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if ( $lote_id <= 0 || ! wp_verify_nonce( $nonce, 'mm_bodega_receipt_' . $lote_id ) ) { wp_send_json_error(array('message'=>'Sesión vencida o lote inválido.'),403); }

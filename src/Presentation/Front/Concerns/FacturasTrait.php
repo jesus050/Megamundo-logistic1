@@ -664,6 +664,15 @@ trait FacturasTrait {
 
     public function ajax_analizar_factura_ia() {
         try {
+            if ( ! is_user_logged_in() || ( ! $this->permission_guard->can_access_bodega_panel() && ! $this->permission_guard->can_access_precios_panel() && ! $this->permission_guard->can_access_jefatura_panel() ) ) {
+                wp_send_json_error( array( 'message' => 'No tienes permiso para analizar facturas con IA.' ), 403 );
+            }
+
+            $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'mm_factura_ia' ) ) {
+                wp_send_json_error( array( 'message' => 'Sesión vencida o acceso no autorizado.' ), 403 );
+            }
+
             $texto_manual = isset( $_POST['texto_factura'] ) ? sanitize_textarea_field( wp_unslash( $_POST['texto_factura'] ) ) : '';
             $result = $this->openai_service->analizar_pedido_con_openai_directo( $texto_manual );
             if ( ! is_array( $result ) || ! empty( $result['error'] ) ) { wp_send_json_error( array( 'message' => is_array($result)&&!empty($result['error'])?$result['error']:'No se pudo analizar factura.', 'data'=>$result ), 500 ); }

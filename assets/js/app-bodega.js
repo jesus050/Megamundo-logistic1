@@ -1666,6 +1666,7 @@ document.querySelectorAll('.mm-resolver-producto-sin-imagen').forEach(function(b
         const fd = new FormData();
         fd.append('action','mm_app_resolver_producto_sin_imagen');
         fd.append('index', this.dataset.index || '');
+        fd.append('nonce', this.dataset.nonce || '');
         const res = await fetch(mmApiSettings.ajaxUrl, {method:'POST', credentials:'same-origin', body:fd});
         const data = await res.json();
         if (!res.ok || !data.success) { alert((data.data && data.data.message) || 'No se pudo marcar.'); return; }

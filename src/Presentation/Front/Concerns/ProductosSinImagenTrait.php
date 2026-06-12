@@ -111,7 +111,7 @@ trait ProductosSinImagenTrait {
                                     <td><strong><?php echo esc_html( $item['producto'] ?? '' ); ?></strong></td>
                                     <td><?php echo esc_html( $item['origen'] ?? '' ); ?></td>
                                     <td><?php echo esc_html( $item['created_at'] ?? '' ); ?></td>
-                                    <td><button class="mm-mini-secondary mm-resolver-producto-sin-imagen" data-index="<?php echo esc_attr( $index ); ?>">Marcar resuelto</button></td>
+                                    <td><button class="mm-mini-secondary mm-resolver-producto-sin-imagen" data-index="<?php echo esc_attr( $index ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'mm_resolver_producto_sin_imagen' ) ); ?>">Marcar resuelto</button></td>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
@@ -124,8 +124,13 @@ trait ProductosSinImagenTrait {
     }
 
     public function ajax_resolver_producto_sin_imagen() {
-        if ( ! is_user_logged_in() ) {
-            wp_send_json_error( array( 'message' => 'No autorizado.' ), 403 );
+        if ( ! is_user_logged_in() || ( ! $this->permission_guard->can_access_bodega_panel() && ! $this->permission_guard->can_access_precios_panel() && ! $this->permission_guard->can_access_jefatura_panel() ) ) {
+            wp_send_json_error( array( 'message' => 'No tienes permiso para resolver productos sin imagen.' ), 403 );
+        }
+
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'mm_resolver_producto_sin_imagen' ) ) {
+            wp_send_json_error( array( 'message' => 'Sesión vencida o acceso no autorizado.' ), 403 );
         }
 
         $index = isset( $_POST['index'] ) ? intval( $_POST['index'] ) : -1;
