@@ -19,6 +19,7 @@ use MegaMundo\Logistica\Application\Sync\SyncScheduler;
 use MegaMundo\Logistica\Presentation\Admin\MetaboxController;
 use MegaMundo\Logistica\Presentation\Admin\SettingsController;
 use MegaMundo\Logistica\Presentation\Front\ScannerViewController;
+use MegaMundo\Logistica\Presentation\Front\PwaController;
 use MegaMundo\Logistica\Presentation\Print\TicketPrintController;
 use MegaMundo\Logistica\Presentation\Rest\ScannerController;
 use MegaMundo\Logistica\Presentation\Rest\InvoiceVisionController;
@@ -138,6 +139,10 @@ class Bootstrap {
             );
         } );
 
+        self::$container->set( PwaController::class, function() {
+            return new PwaController();
+        } );
+
         self::$container->set( TicketPrintController::class, function( $c ) {
             return new TicketPrintController(
                 $c->get( LoteRepository::class ),
@@ -199,6 +204,9 @@ class Bootstrap {
 
         // E) Registrar Vista de Escáner en el Frontend
         self::$container->get( ScannerViewController::class )->register();
+
+        // E.2) PWA instalable (manifest + service worker)
+        self::$container->get( PwaController::class )->register();
 
         // F) Registrar Impresión de Tickets / Etiquetas
         self::$container->get( TicketPrintController::class )->hook();

@@ -39,6 +39,20 @@
         let localIdsEnProgreso = new Set();
         let stream = null;
         let detectorTimer = null;
+        let zxingControls = null;
+
+        // Carga ZXing bajo demanda (fallback para navegadores sin BarcodeDetector, ej. Safari/iOS).
+        function cargarZXing() {
+            return new Promise(function (resolve, reject) {
+                if (window.ZXingBrowser) return resolve();
+                if (!window.mmApiSettings || !mmApiSettings.zxingUrl) return reject(new Error('zxing url no configurada'));
+                const s = document.createElement('script');
+                s.src = mmApiSettings.zxingUrl;
+                s.onload = function () { window.ZXingBrowser ? resolve() : reject(new Error('ZXingBrowser no disponible')); };
+                s.onerror = function () { reject(new Error('no se pudo cargar zxing')); };
+                document.head.appendChild(s);
+            });
+        }
 
         function apiUrl() {
             return (window.mmApiSettings && mmApiSettings.root)
@@ -392,10 +406,25 @@
                 return;
             }
 
-            if (!('BarcodeDetector' in window)) {
-                mostrarMensaje('Este navegador no soporta lectura automática de código de barras. Escribe el SKU manualmente o usa una pistola lectora. La foto del producto nuevo sí se toma desde el campo de imagen.', 'warning');
-                if (inputCodigo) inputCodigo.focus();
-                return;
+            const tieneBarcodeDetector = ('BarcodeDetector' in window);
+            let usarZXing = false;
+
+            if (!tieneBarcodeDetector) {
+                try {
+                    await cargarZXing();
+                    usarZXing = true;
+                } catch (e) {
+                    mostrarMensaje('Este navegador no soporta lectura automática de código de barras. Escribe el SKU manualmente o usa una pistola lectora. La foto del producto nuevo sí se toma desde el campo de imagen.', 'warning');
+                    if (inputCodigo) inputCodigo.focus();
+                    return;
+                }
+            }
+
+            function codigoDetectado(valor) {
+                inputCodigo.value = valor || '';
+                cerrarCamara();
+                mostrarMensaje('Código detectado. Revisa cantidad y guarda el escaneo.', 'success');
+                inputCantidad.focus();
             }
 
             try {
@@ -404,20 +433,24 @@
                 cameraVideo.srcObject = stream;
                 await cameraVideo.play();
 
-                const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'qr_code'] });
                 cameraHelp.textContent = 'Apunta al código. El sistema lo detectará automáticamente.';
 
-                detectorTimer = setInterval(async function () {
-                    try {
-                        const codes = await detector.detect(cameraVideo);
-                        if (codes && codes.length) {
-                            inputCodigo.value = codes[0].rawValue || '';
-                            cerrarCamara();
-                            mostrarMensaje('Código detectado. Revisa cantidad y guarda el escaneo.', 'success');
-                            inputCantidad.focus();
-                        }
-                    } catch (e) {}
-                }, 450);
+                if (usarZXing) {
+                    zxingControls = await new ZXingBrowser.BrowserMultiFormatReader().decodeFromVideoElement(cameraVideo, function (result) {
+                        if (result) codigoDetectado(result.getText());
+                    });
+                } else {
+                    const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'qr_code'] });
+
+                    detectorTimer = setInterval(async function () {
+                        try {
+                            const codes = await detector.detect(cameraVideo);
+                            if (codes && codes.length) {
+                                codigoDetectado(codes[0].rawValue);
+                            }
+                        } catch (e) {}
+                    }, 450);
+                }
             } catch (e) {
                 cerrarCamara();
                 mostrarMensaje('No se pudo abrir la cámara. Revisa permisos del navegador o usa escritura manual.', 'error');
@@ -427,6 +460,10 @@
         function cerrarCamara() {
             if (detectorTimer) clearInterval(detectorTimer);
             detectorTimer = null;
+            if (zxingControls) {
+                try { zxingControls.stop(); } catch (e) {}
+                zxingControls = null;
+            }
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;

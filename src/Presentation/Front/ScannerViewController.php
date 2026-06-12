@@ -127,6 +127,7 @@ class ScannerViewController {
             'isLogged'  => is_user_logged_in(),
             'loginUrl'  => wp_login_url( esc_url_raw( home_url( add_query_arg( null, null ) ) ) ),
             'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+            'zxingUrl'  => plugins_url( 'assets/vendor/zxing/zxing-browser.min.js', $this->plugin_file() ),
         ) );
     }
 

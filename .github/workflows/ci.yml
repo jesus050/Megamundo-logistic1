@@ -49,3 +49,34 @@ jobs:
 
       - name: Ejecutar tests
         run: vendor/bin/phpunit
+
+  package:
+    name: Empaquetar plugin
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir zip limpio del plugin
+        run: |
+          mkdir -p build/megamundo-logistica
+          rsync -a \
+            --exclude='.git*' \
+            --exclude='.github' \
+            --exclude='.refactor' \
+            --exclude='.claude' \
+            --exclude='tests' \
+            --exclude='vendor' \
+            --exclude='node_modules' \
+            --exclude='build' \
+            --exclude='composer.json' \
+            --exclude='phpunit.xml' \
+            ./ build/megamundo-logistica/
+          cd build && zip -rq megamundo-logistica.zip megamundo-logistica
+
+      - name: Publicar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: megamundo-logistica
+          path: build/megamundo-logistica.zip
+          retention-days: 30
