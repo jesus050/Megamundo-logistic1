@@ -1,5 +1,5 @@
 <?php
-namespace MegaMundo\Logistica\Presentation\Print;
+namespace MegaMundo\Logistica\Presentation\Printing;
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 

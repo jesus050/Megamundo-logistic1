@@ -20,7 +20,7 @@ use MegaMundo\Logistica\Presentation\Admin\MetaboxController;
 use MegaMundo\Logistica\Presentation\Admin\SettingsController;
 use MegaMundo\Logistica\Presentation\Front\ScannerViewController;
 use MegaMundo\Logistica\Presentation\Front\PwaController;
-use MegaMundo\Logistica\Presentation\Print\TicketPrintController;
+use MegaMundo\Logistica\Presentation\Printing\TicketPrintController;
 use MegaMundo\Logistica\Presentation\Rest\ScannerController;
 use MegaMundo\Logistica\Presentation\Rest\InvoiceVisionController;
 use MegaMundo\Logistica\Domain\Lote\LoteCommentRepository;
