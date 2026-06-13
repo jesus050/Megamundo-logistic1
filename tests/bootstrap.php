@@ -50,3 +50,15 @@ if ( ! function_exists( 'current_time' ) ) {
         return 'mysql' === $type ? date( 'Y-m-d H:i:s' ) : time();
     }
 }
+
+if ( ! function_exists( 'home_url' ) ) {
+    function home_url( $path = '' ) {
+        return 'https://example.test' . $path;
+    }
+}
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+    function wp_json_encode( $data ) {
+        return json_encode( $data );
+    }
+}

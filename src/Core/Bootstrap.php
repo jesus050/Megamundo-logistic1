@@ -23,10 +23,14 @@ use MegaMundo\Logistica\Presentation\Front\PwaController;
 use MegaMundo\Logistica\Presentation\Printing\TicketPrintController;
 use MegaMundo\Logistica\Presentation\Rest\ScannerController;
 use MegaMundo\Logistica\Presentation\Rest\InvoiceVisionController;
+use MegaMundo\Logistica\Presentation\Rest\IntelligenceController;
 use MegaMundo\Logistica\Domain\Lote\LoteCommentRepository;
 use MegaMundo\Logistica\Application\Lote\ChecklistService;
 use MegaMundo\Logistica\Infrastructure\OpenAI\OpenAiVisionService;
 use MegaMundo\Logistica\Application\Export\MekanoExportService;
+use MegaMundo\Logistica\Application\Pricing\PriceSuggestionService;
+use MegaMundo\Logistica\Application\Quality\CountAnomalyDetector;
+use MegaMundo\Logistica\Application\Integration\WebhookDispatcher;
 
 class Bootstrap {
 
@@ -108,6 +112,18 @@ class Bootstrap {
             );
         } );
 
+        self::$container->set( PriceSuggestionService::class, function() {
+            return new PriceSuggestionService();
+        } );
+
+        self::$container->set( CountAnomalyDetector::class, function() {
+            return new CountAnomalyDetector();
+        } );
+
+        self::$container->set( WebhookDispatcher::class, function() {
+            return new WebhookDispatcher();
+        } );
+
         // 2. Registrar controladores / servicios de aplicación
         self::$container->set( LotePostType::class, function() {
             return new LotePostType();
@@ -166,6 +182,14 @@ class Bootstrap {
             );
         } );
 
+        self::$container->set( IntelligenceController::class, function( $c ) {
+            return new IntelligenceController(
+                $c->get( PriceSuggestionService::class ),
+                $c->get( CountAnomalyDetector::class ),
+                $c->get( PermissionGuard::class )
+            );
+        } );
+
         self::$container->set( SyncProcessor::class, function( $c ) {
             return new SyncProcessor(
                 $c->get( LoteRepository::class ),
@@ -215,11 +239,15 @@ class Bootstrap {
         add_action( 'rest_api_init', function() {
             self::$container->get( ScannerController::class )->register_routes();
             self::$container->get( InvoiceVisionController::class )->register_routes();
+            self::$container->get( IntelligenceController::class )->register_routes();
         } );
 
         // H) Registrar Cola de Sincronización Asíncrona (Action Scheduler)
         self::$container->get( SyncProcessor::class )->hook();
         self::$container->get( SyncScheduler::class )->hook();
+
+        // H.2) Webhooks salientes en transiciones de estado del lote
+        self::$container->get( WebhookDispatcher::class )->hook();
 
         // I) Encolar estilos CSS de administración
         add_action( 'admin_enqueue_scripts', function() {

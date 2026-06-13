@@ -96,6 +96,16 @@ class SettingsController {
             'sanitize_callback' => 'sanitize_text_field',
             'default'           => 'gpt-5.5',
         ) );
+
+        // Webhooks salientes (Fase 4): notificar a sistemas externos en cambios de estado.
+        register_setting( 'mm_logistica_grupo_ajustes', 'mm_webhook_url', array(
+            'sanitize_callback' => 'esc_url_raw',
+            'default'           => '',
+        ) );
+        register_setting( 'mm_logistica_grupo_ajustes', 'mm_webhook_secret', array(
+            'sanitize_callback' => 'sanitize_text_field',
+            'default'           => '',
+        ) );
     }
 
     public function render_pagina_ajustes() {
@@ -149,6 +159,27 @@ class SettingsController {
                         <td>
                             <input type="checkbox" name="mm_ticket_mostrar_calidad" value="1" <?php checked( 1, get_option( 'mm_ticket_mostrar_calidad', 1 ) ); ?> />
                             <span class="description">Imprimir la leyenda "Calidad Garantizada" en cada etiqueta.</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th colspan="2">
+                            <h2 style="margin-top:30px;">🔗 Webhooks salientes</h2>
+                            <p class="description">Notifica a un sistema externo (Slack, n8n, ERP) cuando un lote cambia de estado. Déjalo vacío para desactivar.</p>
+                        </th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">URL del Webhook</th>
+                        <td>
+                            <input type="url" name="mm_webhook_url" value="<?php echo esc_attr( get_option( 'mm_webhook_url', '' ) ); ?>" style="width: 480px;" placeholder="https://hooks.tu-sistema.com/megamundo" />
+                            <p class="description">Se enviará un POST con JSON en cada transición (enviado a precios, a aprobación, aprobado).</p>
+                        </td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Secreto del Webhook</th>
+                        <td>
+                            <input type="text" name="mm_webhook_secret" value="<?php echo esc_attr( get_option( 'mm_webhook_secret', '' ) ); ?>" style="width: 320px;" autocomplete="off" />
+                            <p class="description">Opcional. Si lo defines, cada envío incluirá la cabecera <code>X-MegaMundo-Signature</code> (HMAC-SHA256) para que el receptor verifique el origen.</p>
                         </td>
                     </tr>
 

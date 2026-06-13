@@ -271,4 +271,15 @@ Los traits son el paso intermedio: cada uno define la frontera de un futuro cont
 - `composer install` instala PHPUnit (requiere PHP >= 7.4 en la máquina de desarrollo).
 - `composer test` ejecuta la suite unitaria (`tests/Unit/`, con shims de WordPress en `tests/bootstrap.php` — no requiere WordPress).
 - `composer lint` valida sintaxis de todos los archivos PHP.
-- GitHub Actions (`.github/workflows/ci.yml`) ejecuta lint en PHP 7.4 y 8.2 + PHPUnit en cada push y pull request.
+- GitHub Actions (`.github/workflows/ci.yml`) ejecuta lint en PHP 7.4 y 8.2 + PHPUnit en cada push y pull request, y publica `megamundo-logistica.zip` como artifact descargable.
+
+### Servicios de apoyo a la decisión (Fase 3) e integración (Fase 4)
+Lógica de negocio pura, aislada de la capa de presentación y cubierta por tests:
+
+| Servicio | Qué hace | Cómo se usa |
+|---|---|---|
+| `Application\Pricing\PriceSuggestionService` | Sugiere detal/mayor/gran mayor desde el costo y márgenes objetivo, respetando detal ≥ mayor ≥ gran mayor | `GET /wp-json/megamundo/v1/precios/sugerir?costo=1000&margen_detal=40` |
+| `Application\Quality\CountAnomalyDetector` | Compara esperado vs recibido y marca faltantes/excesos/no esperados con severidad | `GET /wp-json/megamundo/v1/lote/{id}/anomalias` |
+| `Application\Integration\WebhookDispatcher` | POST JSON firmado (HMAC-SHA256 opcional) a un sistema externo en cada transición de estado del lote | Configurable en Ajustes → "Webhooks salientes" (`mm_webhook_url`, `mm_webhook_secret`) |
+
+Los endpoints REST viven en `Presentation\Rest\IntelligenceController` y exigen rol de panel. El frontend que consuma estos endpoints es el siguiente paso, una vez la base esté validada en staging.
