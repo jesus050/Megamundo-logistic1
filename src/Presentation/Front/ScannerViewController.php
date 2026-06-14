@@ -544,34 +544,93 @@ class ScannerViewController {
         <?php return ob_get_clean();
     }
 
-    private function render_sidebar( $active ) {
-        $items = array(
-            'dashboard' => array( 'label' => 'Dashboard', 'icon' => '🏠', 'url' => home_url( '/?mm_logistica_app=dashboard' ) ),
-            'pedidos' => array( 'label' => 'Pedidos', 'icon' => '🛒', 'url' => home_url( '/?mm_logistica_app=pedidos' ) ),
-            'notificaciones' => array( 'label' => 'Notificaciones', 'icon' => '🔔', 'url' => home_url( '/?mm_logistica_app=notificaciones' ) ),
-            'reportes' => array( 'label' => 'Reportes', 'icon' => '📈', 'url' => home_url( '/?mm_logistica_app=reportes' ) ),
-            'productos-nuevos' => array( 'label' => 'Productos nuevos', 'icon' => '🆕', 'url' => home_url( '/?mm_logistica_app=productos-nuevos' ) ),
-            'sincronizacion' => array( 'label' => 'Sincronización', 'icon' => '🔁', 'url' => home_url( '/?mm_logistica_app=sincronizacion' ) ),
-            'usuarios' => array( 'label' => 'Usuarios', 'icon' => '👥', 'url' => home_url( '/?mm_logistica_app=usuarios' ) ),
-            'historial' => array( 'label' => 'Historial', 'icon' => '🧾', 'url' => home_url( '/?mm_logistica_app=historial' ) ),
-            'facturas' => array( 'label' => 'Facturas', 'icon' => '🧾', 'url' => home_url( '/?mm_logistica_app=facturas' ) ),
-            'mekano' => array( 'label' => 'Mekano', 'icon' => '📤', 'url' => home_url( '/?mm_logistica_app=mekano' ) ),
-            'sistema' => array( 'label' => 'Sistema', 'icon' => '🛡️', 'url' => home_url( '/?mm_logistica_app=sistema' ) ),
-            'exhibicion' => array( 'label' => 'Exhibición', 'icon' => '🧺', 'url' => home_url( '/?mm_logistica_app=exhibicion' ) ),
+    /**
+     * Define la estructura del menú agrupada por flujo de trabajo. Cada grupo
+     * declara una condición de visibilidad por rol: una persona solo ve los
+     * grupos que le corresponden, en vez de las 16 opciones planas de antes.
+     */
+    private function sidebar_groups() {
+        $guard      = $this->permission_guard;
+        $is_bodega  = $guard->can_access_bodega_panel();
+        $is_precios = $guard->can_access_precios_panel();
+        $is_jefe    = $guard->can_access_jefatura_panel();
+        $is_admin   = $guard->is_admin();
+
+        $def = array(
+            'inicio' => array(
+                'label'   => 'Inicio',
+                'visible' => true,
+                'items'   => array(
+                    'dashboard'      => array( 'label' => 'Dashboard', 'icon' => '🏠' ),
+                    'notificaciones' => array( 'label' => 'Notificaciones', 'icon' => '🔔' ),
+                ),
+            ),
+            'operacion' => array(
+                'label'   => 'Operación',
+                'visible' => $is_bodega,
+                'items'   => array(
+                    'bodega'           => array( 'label' => 'Bodega', 'icon' => '📦' ),
+                    'exhibicion'       => array( 'label' => 'Exhibición', 'icon' => '🧺' ),
+                    'productos-nuevos' => array( 'label' => 'Productos nuevos', 'icon' => '🆕' ),
+                ),
+            ),
+            'compras' => array(
+                'label'   => 'Compras',
+                'visible' => $is_precios || $is_jefe || $is_admin,
+                'items'   => array(
+                    'pedidos'  => array( 'label' => 'Pedidos', 'icon' => '🛒' ),
+                    'facturas' => array( 'label' => 'Facturas', 'icon' => '🧾' ),
+                ),
+            ),
+            'precios' => array(
+                'label'   => 'Precios',
+                'visible' => $is_precios,
+                'items'   => array(
+                    'precios'   => array( 'label' => 'Precios', 'icon' => '🏷️' ),
+                    'etiquetas' => array( 'label' => 'Etiquetas', 'icon' => '🖨️' ),
+                ),
+            ),
+            'aprobacion' => array(
+                'label'   => 'Aprobación',
+                'visible' => $is_jefe,
+                'items'   => array(
+                    'jefatura'       => array( 'label' => 'Aprobaciones', 'icon' => '📊' ),
+                    'sincronizacion' => array( 'label' => 'Sincronización', 'icon' => '🔁' ),
+                ),
+            ),
+            'analisis' => array(
+                'label'   => 'Análisis',
+                'visible' => $is_jefe || $is_admin,
+                'items'   => array(
+                    'reportes'  => array( 'label' => 'Reportes', 'icon' => '📈' ),
+                    'historial' => array( 'label' => 'Historial', 'icon' => '🕓' ),
+                    'mekano'    => array( 'label' => 'Mekano', 'icon' => '📤' ),
+                ),
+            ),
+            'sistema' => array(
+                'label'   => 'Sistema',
+                'visible' => $is_admin,
+                'items'   => array(
+                    'usuarios' => array( 'label' => 'Usuarios', 'icon' => '👥' ),
+                    'sistema'  => array( 'label' => 'Ajustes', 'icon' => '🛡️' ),
+                ),
+            ),
         );
-        if ( $this->permission_guard->can_access_bodega_panel() ) {
-            $items['bodega'] = array( 'label' => 'Bodega', 'icon' => '📦', 'url' => home_url( '/?mm_logistica_app=bodega' ) );
-            $items['exhibicion'] = array( 'label' => 'Exhibición', 'icon' => '🧺', 'url' => home_url( '/?mm_logistica_app=exhibicion' ) );
+
+        // Etiquetas: jefatura también las imprime aunque no tenga panel de precios.
+        if ( $is_jefe && ! $is_precios ) {
+            $def['precios']['visible'] = true;
+            $def['precios']['items'] = array(
+                'etiquetas' => array( 'label' => 'Etiquetas', 'icon' => '🖨️' ),
+            );
+            $def['precios']['label'] = 'Etiquetas';
         }
-        if ( $this->permission_guard->can_access_precios_panel() ) {
-            $items['precios'] = array( 'label' => 'Precios', 'icon' => '🏷️', 'url' => home_url( '/?mm_logistica_app=precios' ) );
-        }
-        if ( $this->permission_guard->can_access_jefatura_panel() ) {
-            $items['jefatura'] = array( 'label' => 'Jefatura', 'icon' => '📊', 'url' => home_url( '/?mm_logistica_app=jefatura' ) );
-        }
-        if ( $this->permission_guard->can_access_precios_panel() || $this->permission_guard->can_access_jefatura_panel() ) {
-            $items['etiquetas'] = array( 'label' => 'Etiquetas', 'icon' => '🏷️', 'url' => home_url( '/?mm_logistica_app=etiquetas' ) );
-        }
+
+        return $def;
+    }
+
+    private function render_sidebar( $active ) {
+        $groups = $this->sidebar_groups();
 
         ob_start(); ?>
         <aside class="mm-platform-sidebar">
@@ -580,10 +639,14 @@ class ScannerViewController {
                 <div><strong>MegaMundo</strong><span>Logística</span></div>
             </div>
             <nav class="mm-platform-nav">
-                <?php foreach ( $items as $key => $item ) : ?>
-                    <a class="<?php echo $active === $key ? 'is-active' : ''; ?>" href="<?php echo esc_url( $item['url'] ); ?>">
-                        <span><?php echo esc_html( $item['icon'] ); ?></span><?php echo esc_html( $item['label'] ); ?>
-                    </a>
+                <?php foreach ( $groups as $group ) : ?>
+                    <?php if ( empty( $group['visible'] ) || empty( $group['items'] ) ) { continue; } ?>
+                    <p class="mm-nav-group-label"><?php echo esc_html( $group['label'] ); ?></p>
+                    <?php foreach ( $group['items'] as $key => $item ) : ?>
+                        <a class="<?php echo $active === $key ? 'is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/?mm_logistica_app=' . $key ) ); ?>">
+                            <span class="mm-nav-icon" aria-hidden="true"><?php echo esc_html( $item['icon'] ); ?></span><?php echo esc_html( $item['label'] ); ?>
+                        </a>
+                    <?php endforeach; ?>
                 <?php endforeach; ?>
             </nav>
             <div class="mm-platform-user">

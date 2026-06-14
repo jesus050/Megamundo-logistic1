@@ -1,235 +1,292 @@
+/* =========================================================================
+   MegaMundo Logística · Skin de interfaz (capa autoritativa)
+   v4.8.0 — rediseño visual: plano, calmo y consistente.
 
-/* MegaMundo Logística - UI Premium forzada v4.7.1 */
-:root{
-  --mm-bg:#f4f7fb;
-  --mm-card:rgba(255,255,255,.92);
-  --mm-border:rgba(148,163,184,.22);
-  --mm-text:#0f172a;
-  --mm-muted:#64748b;
-  --mm-blue:#0ea5e9;
-  --mm-indigo:#6366f1;
-  --mm-purple:#7c3aed;
-  --mm-shadow:0 22px 60px rgba(15,23,42,.10);
-  --mm-radius:26px;
+   Esta hoja carga de último (prioridad 999) y usa !important a propósito:
+   es la capa que neutraliza el ruido de las capas previas (degradados,
+   font-weight 900, radios de 26-32px, sombras grandes) y deja un sistema
+   de diseño único. Editar SOLO aquí para ajustar la apariencia global.
+   ========================================================================= */
+
+:root {
+  --mm-bg:        #f4f6fa;   /* fondo de la app, plano */
+  --mm-surface:   #ffffff;   /* tarjetas y paneles */
+  --mm-surface-2: #f8fafc;   /* superficies suaves */
+  --mm-ink:       #0f172a;   /* texto principal */
+  --mm-ink-soft:  #475569;   /* texto secundario */
+  --mm-ink-mute:  #94a3b8;   /* texto terciario / hints */
+  --mm-line:      #e2e8f0;   /* bordes */
+  --mm-primary:   #2563eb;   /* acento principal */
+  --mm-primary-d: #1d4ed8;   /* acento oscuro (hover) */
+  --mm-nav:       #0f172a;   /* sidebar */
+  --mm-nav-2:     #1e293b;   /* superficies dentro del sidebar */
+  --mm-success:   #16a34a;
+  --mm-warning:   #d97706;
+  --mm-danger:    #dc2626;
+  --mm-radius:    12px;
+  --mm-radius-sm: 9px;
 }
 
-html body{
-  background:var(--mm-bg)!important;
-}
+/* ---- Lienzo: fondo plano, sin degradados radiales peleando ------------- */
+html body { background: var(--mm-bg) !important; }
 
+body:has(.mm-platform-shell),
 .mm-platform,
 .mm-logistica-app,
-.mm-app-shell{
-  min-height:100vh!important;
-  background:
-    radial-gradient(circle at 80% 0%, rgba(124,58,237,.16), transparent 34rem),
-    radial-gradient(circle at 10% 10%, rgba(14,165,233,.14), transparent 28rem),
-    linear-gradient(180deg,#f8fbff 0%,#eef4fb 100%)!important;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
-  color:var(--mm-text)!important;
-}
-
-.mm-sidebar,
-.mm-platform-sidebar,
-.mm-app-sidebar,
-.mm-layout-sidebar{
-  background:linear-gradient(180deg,#101827 0%,#1e293b 55%,#0f172a 100%)!important;
-  box-shadow:14px 0 40px rgba(15,23,42,.14)!important;
-}
-
-.mm-sidebar a,
-.mm-platform-sidebar a,
-.mm-app-sidebar a,
-.mm-layout-sidebar a{
-  border-radius:16px!important;
-  font-weight:900!important;
-  transition:.18s ease!important;
-}
-
-.mm-sidebar a:hover,
-.mm-platform-sidebar a:hover,
-.mm-app-sidebar a:hover{
-  transform:translateX(3px)!important;
-  background:rgba(255,255,255,.08)!important;
-}
-
-.mm-sidebar a.is-active,
-.mm-platform-sidebar a.is-active,
-.mm-app-sidebar a.is-active,
-.mm-layout-sidebar a.is-active{
-  background:linear-gradient(135deg,var(--mm-blue),var(--mm-indigo),var(--mm-purple))!important;
-  color:#fff!important;
-  box-shadow:0 14px 32px rgba(99,102,241,.30)!important;
+.mm-app-shell,
+.mm-platform-shell {
+  background: var(--mm-bg) !important;
+  color: var(--mm-ink) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif !important;
 }
 
 .mm-platform-main,
 main.mm-platform-main,
 .mm-main,
-.mm-content{
-  padding:42px 44px!important;
-  background:
-    radial-gradient(circle at top right, rgba(99,102,241,.12), transparent 38rem),
-    radial-gradient(circle at top left, rgba(14,165,233,.10), transparent 30rem),
-    #f4f7fb!important;
+.mm-content {
+  background: transparent !important;
+  padding: clamp(20px, 3vw, 40px) !important;
 }
 
+/* ---- Sidebar: navy plano, sin triple degradado ni blur ----------------- */
+.mm-sidebar,
+.mm-platform-sidebar,
+.mm-app-sidebar,
+.mm-layout-sidebar {
+  background: var(--mm-nav) !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(255,255,255,.06) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.mm-platform-brand,
+.mm-brand-block {
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: var(--mm-radius) !important;
+}
+.mm-platform-brand strong,
+.mm-brand-block strong { font-weight: 600 !important; }
+.mm-brand-mark {
+  background: var(--mm-primary) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+/* Etiqueta de grupo del menú (nueva) */
+.mm-nav-group-label {
+  margin: 16px 12px 4px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em !important;
+  color: rgba(255,255,255,.42) !important;
+}
+.mm-platform-nav { gap: 2px !important; }
+.mm-platform-nav a,
+.mm-sidebar a,
+.mm-app-sidebar a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  color: rgba(255,255,255,.74) !important;
+  padding: 10px 12px !important;
+  border-radius: var(--mm-radius-sm) !important;
+  font-weight: 500 !important;
+  border: 0 !important;
+  transition: background .15s ease, color .15s ease !important;
+}
+.mm-nav-icon { font-size: 17px; width: 22px; text-align: center; }
+.mm-platform-nav a:hover,
+.mm-sidebar a:hover,
+.mm-app-sidebar a:hover {
+  background: rgba(255,255,255,.07) !important;
+  color: #fff !important;
+  transform: none !important;
+}
+.mm-platform-nav a.is-active,
+.mm-sidebar a.is-active,
+.mm-app-sidebar a.is-active,
+.mm-layout-sidebar a.is-active {
+  background: var(--mm-primary) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.mm-platform-user {
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: var(--mm-radius) !important;
+}
+.mm-platform-user strong { font-weight: 600 !important; }
+
+/* ---- Encabezado de página: superficie sólida calma, sin gradiente ------ */
+.mm-platform-header,
 .mm-dashboard-hero,
 .mm-hero,
-.mm-page-hero{
-  background:
-    radial-gradient(circle at 85% 15%, rgba(255,255,255,.20), transparent 18rem),
-    linear-gradient(135deg,#0f172a 0%,#1e3a8a 48%,#5b21b6 100%)!important;
-  color:white!important;
-  border-radius:32px!important;
-  border:1px solid rgba(255,255,255,.13)!important;
-  box-shadow:0 28px 80px rgba(30,64,175,.22)!important;
-  padding:36px!important;
+.mm-page-hero {
+  background: var(--mm-nav) !important;
+  border: 0 !important;
+  border-radius: var(--mm-radius) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding: 24px 28px !important;
+  overflow: visible !important;
 }
+.mm-platform-header::before,
+.mm-dashboard-hero::before,
+.mm-hero::before,
+.mm-page-hero::before { display: none !important; content: none !important; }
 
+.mm-platform-header h1,
 .mm-dashboard-hero h1,
 .mm-hero h1,
-.mm-page-hero h1{
-  color:white!important;
-  font-size:clamp(32px,4vw,58px)!important;
-  letter-spacing:-.05em!important;
-  margin:8px 0!important;
+.mm-page-hero h1 {
+  font-size: clamp(24px, 3vw, 32px) !important;
+  font-weight: 600 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.15 !important;
+  color: #fff !important;
+  margin: 6px 0 !important;
 }
-
+.mm-platform-header p,
 .mm-dashboard-hero p,
 .mm-hero p,
-.mm-page-hero p{
-  color:rgba(255,255,255,.82)!important;
+.mm-page-hero p {
+  color: rgba(255,255,255,.78) !important;
+  font-weight: 400 !important;
+  font-size: 15px !important;
 }
 
+/* Eyebrow / kicker: pastilla discreta */
+.mm-eyebrow,
+.mm-card-kicker {
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  letter-spacing: .04em !important;
+  text-transform: none !important;
+  border-radius: 999px !important;
+  padding: 5px 10px !important;
+}
+
+/* Encabezado de sección dentro del contenido */
+.mm-section-head {
+  font-weight: 600 !important;
+  color: var(--mm-ink) !important;
+  letter-spacing: -.01em !important;
+}
+
+/* ---- Tarjetas: planas, borde sutil, radio moderado --------------------- */
+.mm-role-summary-card,
 .mm-platform-section,
+.mm-detail-card,
+.mm-kpi-card,
 .mm-scan-card,
-.mm-card,
+.mm-report-filter-card,
+.mm-report-export-card,
+.mm-platform-lote-card,
 .mm-panel,
-.mm-bodega-card{
-  background:var(--mm-card)!important;
-  border:1px solid var(--mm-border)!important;
-  border-radius:var(--mm-radius)!important;
-  box-shadow:var(--mm-shadow)!important;
-  backdrop-filter:blur(14px)!important;
-  -webkit-backdrop-filter:blur(14px)!important;
+.mm-bodega-card,
+.mm-card {
+  background: var(--mm-surface) !important;
+  border: 1px solid var(--mm-line) !important;
+  border-radius: var(--mm-radius) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
+.mm-role-summary-card:hover,
+.mm-platform-lote-card:hover {
+  border-color: #cbd5e1 !important;
+  transform: none !important;
+}
+.mm-detail-card-head,
+.mm-card-head { border-bottom: 1px solid var(--mm-line) !important; }
 
-.mm-platform-section{
-  padding:24px!important;
-  margin-bottom:24px!important;
-}
+.mm-kpi-card strong,
+.mm-role-summary-card strong { font-weight: 600 !important; }
 
-.mm-section-head h2,
-.mm-platform-section h2,
-.mm-scan-card h2{
-  color:var(--mm-text)!important;
-  letter-spacing:-.035em!important;
-  font-size:clamp(22px,2.4vw,34px)!important;
+/* ---- Botones ----------------------------------------------------------- */
+.mm-primary-action,
+.mm-mini-primary {
+  background: var(--mm-primary) !important;
+  border: 1px solid var(--mm-primary) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  border-radius: var(--mm-radius-sm) !important;
+  box-shadow: none !important;
+  transition: background .15s ease !important;
 }
+.mm-primary-action:hover,
+.mm-mini-primary:hover { background: var(--mm-primary-d) !important; border-color: var(--mm-primary-d) !important; transform: none !important; }
 
-.mm-section-head span,
-.mm-platform-section p,
-.mm-scan-card p{
-  color:var(--mm-muted)!important;
-  font-weight:750!important;
+.mm-secondary-action,
+.mm-mini-secondary {
+  background: var(--mm-surface) !important;
+  border: 1px solid var(--mm-line) !important;
+  color: var(--mm-ink) !important;
+  font-weight: 500 !important;
+  border-radius: var(--mm-radius-sm) !important;
+  box-shadow: none !important;
 }
-
-.mm-input,
-.mm-platform input[type="text"],
-.mm-platform input[type="number"],
-.mm-platform input[type="date"],
-.mm-platform input[type="email"],
-.mm-platform select,
-.mm-platform textarea,
-.mm-logistica-app input[type="text"],
-.mm-logistica-app input[type="number"],
-.mm-logistica-app select,
-.mm-logistica-app textarea{
-  background:rgba(255,255,255,.96)!important;
-  border:1px solid rgba(148,163,184,.28)!important;
-  border-radius:16px!important;
-  min-height:52px!important;
-  color:var(--mm-text)!important;
-  font-weight:750!important;
-  box-shadow:0 8px 20px rgba(15,23,42,.04)!important;
-}
-
-.mm-input:focus,
-.mm-platform input:focus,
-.mm-platform select:focus,
-.mm-platform textarea:focus{
-  border-color:rgba(99,102,241,.72)!important;
-  box-shadow:0 0 0 4px rgba(99,102,241,.14),0 12px 28px rgba(15,23,42,.08)!important;
-  outline:none!important;
-}
+.mm-secondary-action:hover,
+.mm-mini-secondary:hover { background: var(--mm-surface-2) !important; border-color: #cbd5e1 !important; }
 
 .mm-mini-primary,
-.mm-primary-btn,
-.mm-platform button[type="submit"],
-.mm-logistica-app button[type="submit"],
-.mm-platform .button-primary{
-  border:0!important;
-  border-radius:16px!important;
-  background:linear-gradient(135deg,var(--mm-blue),var(--mm-indigo),var(--mm-purple))!important;
-  color:#fff!important;
-  font-weight:950!important;
-  min-height:48px!important;
-  padding:12px 18px!important;
-  box-shadow:0 16px 34px rgba(99,102,241,.28)!important;
-}
+.mm-mini-secondary { font-size: 13px !important; padding: 7px 12px !important; }
 
-.mm-mini-secondary,
-.mm-secondary-btn,
-.mm-platform .button{
-  border:1px solid rgba(148,163,184,.25)!important;
-  border-radius:16px!important;
-  background:rgba(255,255,255,.92)!important;
-  color:#0f172a!important;
-  font-weight:900!important;
-  min-height:46px!important;
-  padding:11px 16px!important;
-  box-shadow:0 10px 24px rgba(15,23,42,.06)!important;
+/* ---- Formularios ------------------------------------------------------- */
+.mm-input,
+.mm-textarea,
+.mm-price-input,
+.mm-platform-shell input[type="text"],
+.mm-platform-shell input[type="number"],
+.mm-platform-shell input[type="url"],
+.mm-platform-shell select {
+  background: var(--mm-surface) !important;
+  border: 1px solid var(--mm-line) !important;
+  border-radius: var(--mm-radius-sm) !important;
+  color: var(--mm-ink) !important;
+  font-weight: 400 !important;
+  box-shadow: none !important;
 }
-
-.mm-platform table,
-.mm-logistica-app table{
-  border-collapse:separate!important;
-  border-spacing:0!important;
-  background:rgba(255,255,255,.86)!important;
-  border-radius:18px!important;
-  overflow:hidden!important;
+.mm-input:focus,
+.mm-textarea:focus,
+.mm-price-input:focus,
+.mm-platform-shell input:focus,
+.mm-platform-shell select:focus {
+  border-color: var(--mm-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.15) !important;
 }
+.mm-field-label { color: var(--mm-ink-soft) !important; font-weight: 500 !important; }
 
-.mm-platform th,
-.mm-logistica-app th{
-  background:#eef4fb!important;
-  color:#64748b!important;
-  font-size:11px!important;
-  letter-spacing:.08em!important;
-  text-transform:uppercase!important;
-  font-weight:950!important;
+/* ---- Misceláneos ------------------------------------------------------- */
+.mm-empty-state {
+  background: var(--mm-surface-2) !important;
+  border: 1px dashed var(--mm-line) !important;
+  border-radius: var(--mm-radius) !important;
+  color: var(--mm-ink-soft) !important;
 }
-
-.mm-upload-box,
-.mm-photo-box,
-.mm-image-picker,
-.mm-camera-box{
-  border:2px dashed rgba(59,130,246,.32)!important;
-  background:linear-gradient(180deg,rgba(239,246,255,.92),rgba(255,255,255,.72))!important;
-  border-radius:24px!important;
+.mm-badge-soft {
+  background: #eff6ff !important;
+  border: 1px solid #dbeafe !important;
+  color: var(--mm-primary-d) !important;
+  font-weight: 600 !important;
+  border-radius: 999px !important;
 }
-
-.mm-error,
-.mm-alert-error,
-.notice-error{
-  background:#fef2f2!important;
-  border:1px solid #fecaca!important;
-  color:#991b1b!important;
-  border-radius:18px!important;
-  padding:14px!important;
-  overflow-wrap:anywhere!important;
+.mm-safe-note {
+  background: var(--mm-surface-2) !important;
+  border: 1px solid var(--mm-line) !important;
+  border-radius: var(--mm-radius-sm) !important;
+  color: var(--mm-ink-soft) !important;
 }
+.mm-message { border-radius: var(--mm-radius-sm) !important; }
 
-@media(max-width:900px){
-  .mm-platform-main, main.mm-platform-main{padding:22px 16px!important}
+/* ---- Responsive: ajuste de etiquetas de grupo en móvil ----------------- */
+@media (max-width: 980px) {
+  .mm-nav-group-label { margin-top: 12px !important; }
 }
