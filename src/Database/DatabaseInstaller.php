@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 class DatabaseInstaller {
 
-    private $db_version = '3.0.0';
+    private $db_version = '3.1.0';
 
     public function get_db_version() {
         return $this->db_version;
@@ -16,6 +16,7 @@ class DatabaseInstaller {
         $table_name = $wpdb->prefix . 'mm_lote_items';
         $table_audit    = $wpdb->prefix . 'mm_lote_audit_logs';
         $table_comments = $wpdb->prefix . 'mm_lote_comments';
+        $table_inv      = $wpdb->prefix . 'mm_inventario';
         $charset_collate = $wpdb->get_charset_collate();
 
         $sql = "CREATE TABLE $table_name (
@@ -73,10 +74,30 @@ class DatabaseInstaller {
             KEY created_at (created_at)
         ) $charset_collate;";
 
+        // Inventario importado desde Mekano: base para el análisis de rotación.
+        // Una fila por SKU; reimportar actualiza (UNIQUE en sku).
+        $sql_inv = "CREATE TABLE $table_inv (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            sku varchar(191) DEFAULT '' NOT NULL,
+            nombre varchar(255) DEFAULT '' NOT NULL,
+            linea varchar(191) DEFAULT '' NOT NULL,
+            stock int(11) DEFAULT 0 NOT NULL,
+            costo decimal(12,2) DEFAULT 0.00 NOT NULL,
+            ultima_venta date DEFAULT NULL,
+            vendido_periodo int(11) DEFAULT NULL,
+            periodo_dias int(11) DEFAULT NULL,
+            importado_en datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY sku (sku),
+            KEY linea (linea),
+            KEY ultima_venta (ultima_venta)
+        ) $charset_collate;";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
         dbDelta( $sql_audit );
         dbDelta( $sql_comments );
+        dbDelta( $sql_inv );
 
         update_option( 'mm_logistica_db_version', $this->db_version );
     }
