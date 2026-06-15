@@ -199,6 +199,7 @@ trait FacturasTrait {
         $facturas = $lote_id ? $this->get_facturas_lote( $lote_id ) : array();
         $nonce = $lote_id ? wp_create_nonce( 'mm_factura_lote_' . $lote_id ) : '';
         $costo_lote = $lote_id ? $this->calcular_costo_lote_factura( $lote_id ) : 0;
+        $pedido_origen = $lote_id ? intval( get_post_meta( $lote_id, '_mm_pedido_origen_id', true ) ) : 0;
 
         $total_facturas = 0;
         $pendientes = 0;
@@ -224,6 +225,9 @@ trait FacturasTrait {
                         <span class="mm-eyebrow">Facturas de proveedor</span>
                         <h1>Registro de facturas por lote</h1>
                         <p>Asocia facturas de compra al lote, sube soporte y compara el total facturado contra el costo ingresado.</p>
+                        <?php if ( $pedido_origen ) : ?>
+                            <a class="mm-badge-soft" style="margin-top:10px; display:inline-block; text-decoration:none;" href="<?php echo esc_url( home_url( '/?mm_logistica_app=pedidos' ) ); ?>">↩ Este lote viene del pedido #<?php echo esc_html( $pedido_origen ); ?></a>
+                        <?php endif; ?>
                     </div>
                 </header>
 

@@ -464,6 +464,7 @@ trait PedidosTrait {
                                 <div class="mm-pedido-actions">
                                     <?php if ( $lote_id ) : ?>
                                         <a class="mm-mini-primary" href="<?php echo esc_url( home_url( '/?mm_logistica_app=bodega&lote_id=' . $lote_id ) ); ?>">Ir a bodega</a>
+                                        <a class="mm-mini-secondary" href="<?php echo esc_url( home_url( '/?mm_logistica_app=facturas&lote_id=' . $lote_id ) ); ?>">Ver facturas</a>
                                     <?php else : ?>
                                         <button type="button" class="mm-mini-primary mm-pedido-create-lote" data-pedido="<?php echo esc_attr( $pedido_id ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">Crear lote</button>
                                     <?php endif; ?>
