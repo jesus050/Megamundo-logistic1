@@ -29,6 +29,7 @@ class ScannerViewController {
     use Concerns\EtiquetasTrait;
     use Concerns\JefaturaTrait;
     use Concerns\LoteDetailTrait;
+    use Concerns\RotacionTrait;
 
     private $lote_repo;
     private $item_repo;
@@ -86,6 +87,8 @@ class ScannerViewController {
         add_action( 'wp_ajax_mm_app_crear_lote_desde_pedido', array( $this, 'ajax_crear_lote_desde_pedido' ) );
         add_action( 'wp_ajax_mm_app_actualizar_factura_pedido', array( $this, 'ajax_actualizar_factura_pedido' ) );
         add_action( 'wp_ajax_mm_app_cerrar_pedido_compra', array( $this, 'ajax_cerrar_pedido_compra' ) );
+        add_action( 'wp_ajax_mm_app_rotacion_preview', array( $this, 'ajax_rotacion_importar_preview' ) );
+        add_action( 'wp_ajax_mm_app_rotacion_confirmar', array( $this, 'ajax_rotacion_importar_confirmar' ) );
     }
 
     private function plugin_file() {
@@ -155,7 +158,7 @@ class ScannerViewController {
             exit;
         }
 
-        if ( ! in_array( $app, array( 'dashboard', 'pedidos', 'bodega', 'exhibicion', 'precios', 'jefatura', 'etiquetas', 'notificaciones', 'reportes', 'reports', 'productos-nuevos', 'sincronizacion', 'usuarios', 'historial', 'sistema', 'facturas', 'mekano' , 'exhibicion'), true ) ) {
+        if ( ! in_array( $app, array( 'dashboard', 'pedidos', 'bodega', 'exhibicion', 'precios', 'jefatura', 'etiquetas', 'notificaciones', 'reportes', 'reports', 'productos-nuevos', 'sincronizacion', 'usuarios', 'historial', 'sistema', 'facturas', 'mekano', 'rotacion', 'exhibicion'), true ) ) {
             return;
         }
 
@@ -193,6 +196,7 @@ class ScannerViewController {
             'sistema' => 'MegaMundo Logística | Sistema',
             'facturas' => 'MegaMundo Logística | Facturas',
             'mekano' => 'MegaMundo Logística | Mekano',
+            'rotacion' => 'MegaMundo Logística | Rotación',
             'bodega'   => 'MegaMundo Bodega | Escáner',
             'exhibicion' => 'MegaMundo Logística | Exhibición',
             'precios'  => 'MegaMundo Precios | Liquidación',
@@ -290,6 +294,13 @@ class ScannerViewController {
 
         if ( 'sistema' === $app ) {
             return $this->render_safe_app_section( 'Sistema', array( $this, 'render_sistema_dashboard' ) );
+        }
+
+        if ( 'rotacion' === $app ) {
+            if ( ! $this->permission_guard->can_access_jefatura_panel() && ! $this->permission_guard->is_admin() ) {
+                return $this->render_denied_app( 'No tienes permiso para ver el módulo de rotación.' );
+            }
+            return $this->render_safe_app_section( 'Rotación', array( $this, 'render_rotacion_dashboard' ) );
         }
 
         if ( 'dashboard' === $app ) {
@@ -602,6 +613,7 @@ class ScannerViewController {
                 'label'   => 'Análisis',
                 'visible' => $is_jefe || $is_admin,
                 'items'   => array(
+                    'rotacion'  => array( 'label' => 'Rotación', 'icon' => '📉' ),
                     'reportes'  => array( 'label' => 'Reportes', 'icon' => '📈' ),
                     'historial' => array( 'label' => 'Historial', 'icon' => '🕓' ),
                     'mekano'    => array( 'label' => 'Mekano', 'icon' => '📤' ),
