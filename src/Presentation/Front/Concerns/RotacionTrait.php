@@ -17,8 +17,13 @@ use MegaMundo\Logistica\Application\Inventory\StockRotationReport;
  */
 trait RotacionTrait {
 
-    const ROTACION_PERIODO_OPTION  = 'mm_rotacion_periodo_inicio';
-    const ROTACION_PERIODO_DEFAULT = '2026-04-01';
+    private function rotacion_periodo_option() {
+        return 'mm_rotacion_periodo_inicio';
+    }
+
+    private function rotacion_periodo_default() {
+        return '2026-04-01';
+    }
 
     private function sales_repo() {
         static $r = null;
@@ -46,8 +51,8 @@ trait RotacionTrait {
     }
 
     private function rotacion_periodo_inicio() {
-        $v = (string) get_option( self::ROTACION_PERIODO_OPTION, self::ROTACION_PERIODO_DEFAULT );
-        return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ? $v : self::ROTACION_PERIODO_DEFAULT;
+        $v = (string) get_option( $this->rotacion_periodo_option(), $this->rotacion_periodo_default() );
+        return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $v ) ? $v : $this->rotacion_periodo_default();
     }
 
     private function rotacion_periodo_label() {
