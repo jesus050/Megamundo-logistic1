@@ -238,6 +238,13 @@ main.mm-platform-main,
 .mm-mini-primary,
 .mm-mini-secondary { font-size: 13px !important; padding: 7px 12px !important; }
 
+/* Chips de filtro de Rotación: el activo se resalta en azul */
+.mm-rot-chip.is-on {
+  background: var(--mm-primary) !important;
+  border-color: var(--mm-primary) !important;
+  color: #fff !important;
+}
+
 /* ---- Formularios ------------------------------------------------------- */
 .mm-input,
 .mm-textarea,

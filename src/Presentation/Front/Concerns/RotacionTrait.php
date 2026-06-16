@@ -74,7 +74,18 @@ trait RotacionTrait {
             );
         }
         $sum   = $report['summary'];
-        $items = array_slice( $report['items'], 0, 300 );
+        // Para la tabla: mostrar las 3 categorías (no solo lo parado).
+        $por_estado = array( StockRotationReport::NO_ROTA => array(), StockRotationReport::LENTO => array(), StockRotationReport::OK => array() );
+        foreach ( $report['items'] as $it ) { $por_estado[ $it['estado'] ][] = $it; }
+        $items = array_merge(
+            array_slice( $por_estado[ StockRotationReport::NO_ROTA ], 0, 150 ),
+            array_slice( $por_estado[ StockRotationReport::LENTO ], 0, 100 ),
+            array_slice( $por_estado[ StockRotationReport::OK ], 0, 100 )
+        );
+        $tot = max( 1, (int) $sum['total'] );
+        $pct_no = (int) round( $sum[ StockRotationReport::NO_ROTA ] / $tot * 100 );
+        $pct_le = (int) round( $sum[ StockRotationReport::LENTO ] / $tot * 100 );
+        $pct_ok = (int) round( $sum[ StockRotationReport::OK ] / $tot * 100 );
         $nonce = wp_create_nonce( 'mm_rotacion_import' );
         $periodo = $this->rotacion_periodo_label();
 
@@ -102,6 +113,22 @@ trait RotacionTrait {
                     <div class="mm-role-summary-card"><small>Unidades paradas</small><strong><?php echo esc_html( number_format_i18n( $sum['unidades_paradas'] ) ); ?></strong></div>
                 </div>
 
+                <?php if ( $tiene_inv ) : ?>
+                <div class="mm-platform-section" style="margin-bottom:18px;">
+                    <h2 class="mm-section-head">Distribución de la rotación</h2>
+                    <div style="display:flex; height:26px; border-radius:8px; overflow:hidden; margin:12px 0 10px; background:#f1f5f9;">
+                        <div title="No rota" style="width:<?php echo esc_attr( $pct_no ); ?>%; background:#dc2626;"></div>
+                        <div title="Lento" style="width:<?php echo esc_attr( $pct_le ); ?>%; background:#f59e0b;"></div>
+                        <div title="Rotando" style="width:<?php echo esc_attr( $pct_ok ); ?>%; background:#16a34a;"></div>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:18px; font-size:12px; color:var(--mm-ink-soft,#475569);">
+                        <span><span style="display:inline-block;width:10px;height:10px;background:#dc2626;border-radius:2px;margin-right:5px;"></span>No rota — <?php echo esc_html( $sum[ StockRotationReport::NO_ROTA ] ); ?> (<?php echo esc_html( $pct_no ); ?>%)</span>
+                        <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:5px;"></span>Lento — <?php echo esc_html( $sum[ StockRotationReport::LENTO ] ); ?> (<?php echo esc_html( $pct_le ); ?>%)</span>
+                        <span><span style="display:inline-block;width:10px;height:10px;background:#16a34a;border-radius:2px;margin-right:5px;"></span>Rotando — <?php echo esc_html( $sum[ StockRotationReport::OK ] ); ?> (<?php echo esc_html( $pct_ok ); ?>%)</span>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <div class="mm-platform-card-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;">
                     <div class="mm-platform-section">
                         <h2 class="mm-section-head">1. Cargar existencias</h2>
@@ -126,14 +153,20 @@ trait RotacionTrait {
                 </div>
 
                 <div class="mm-platform-section">
-                    <h2 class="mm-section-head">Mercancía que no rota</h2>
+                    <h2 class="mm-section-head">Detalle por producto</h2>
                     <?php if ( ! $tiene_inv ) : ?>
                         <div class="mm-empty-state">Carga primero las existencias (paso 1) para ver el stock parado. Si además cargas las ventas, sabrás hace cuánto no se vende cada producto.</div>
                     <?php else : ?>
                         <?php if ( ! $tiene_ventas ) : ?>
                             <div class="mm-safe-note" style="margin-bottom:12px;">Cargaste existencias pero aún no hay ventas: todo aparece como "no rota". Carga las ventas (paso 2) para distinguir lo que sí se mueve.</div>
                         <?php endif; ?>
-                        <p class="mm-safe-note" style="margin:8px 0 12px;">Mostrando los <?php echo count( $items ); ?> productos con más unidades paradas.</p>
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 14px;">
+                            <button type="button" class="mm-rot-chip mm-mini-secondary is-on" data-filtro="todos">Todos</button>
+                            <button type="button" class="mm-rot-chip mm-mini-secondary" data-filtro="no_rota">No rota</button>
+                            <button type="button" class="mm-rot-chip mm-mini-secondary" data-filtro="lento">Lento</button>
+                            <button type="button" class="mm-rot-chip mm-mini-secondary" data-filtro="ok">Rotando</button>
+                            <input type="search" id="mm-rot-buscar" class="mm-input" placeholder="Buscar por SKU o nombre…" style="max-width:260px; margin-left:auto;">
+                        </div>
                         <table style="width:100%; border-collapse:collapse; font-size:13px;">
                             <thead>
                                 <tr style="text-align:left; border-bottom:1px solid var(--mm-line,#e2e8f0);">
@@ -154,7 +187,7 @@ trait RotacionTrait {
                                     );
                                     $b = $badge[ $it['estado'] ] ?? array( $it['estado'], '#f1f5f9', '#475569' );
                                     ?>
-                                    <tr style="border-bottom:1px solid var(--mm-line,#eef2f7);">
+                                    <tr class="mm-rot-row" data-estado="<?php echo esc_attr( $it['estado'] ); ?>" data-buscar="<?php echo esc_attr( strtolower( $it['sku'] . ' ' . $it['nombre'] ) ); ?>" style="border-bottom:1px solid var(--mm-line,#eef2f7);">
                                         <td style="padding:8px 6px; font-family:monospace;"><?php echo esc_html( $it['sku'] ); ?></td>
                                         <td style="padding:8px 6px;"><?php echo esc_html( $it['nombre'] ); ?></td>
                                         <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></td>
@@ -202,6 +235,28 @@ trait RotacionTrait {
                     } catch (err) { box.innerHTML = '<p class="mm-message mm-message-error">Error de conexión.</p>'; }
                 });
             });
+
+            // Filtros por estado + buscador de la tabla
+            var rows = Array.prototype.slice.call(document.querySelectorAll('.mm-rot-row'));
+            var chips = Array.prototype.slice.call(document.querySelectorAll('.mm-rot-chip'));
+            var buscar = document.getElementById('mm-rot-buscar');
+            var filtro = 'todos';
+            function aplicar(){
+                var q = (buscar && buscar.value ? buscar.value : '').trim().toLowerCase();
+                rows.forEach(function(tr){
+                    var okEstado = (filtro === 'todos') || (tr.dataset.estado === filtro);
+                    var okBusca = !q || (tr.dataset.buscar || '').indexOf(q) !== -1;
+                    tr.style.display = (okEstado && okBusca) ? '' : 'none';
+                });
+            }
+            chips.forEach(function(c){
+                c.addEventListener('click', function(){
+                    filtro = c.dataset.filtro;
+                    chips.forEach(function(x){ x.classList.toggle('is-on', x === c); });
+                    aplicar();
+                });
+            });
+            if (buscar) { buscar.addEventListener('input', aplicar); }
         })();
         </script>
         <?php return ob_get_clean();
