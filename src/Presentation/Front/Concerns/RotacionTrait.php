@@ -79,6 +79,8 @@ trait RotacionTrait {
             );
         }
         $sum   = $report['summary'];
+        $fuente_ventas = isset( $report['fuente_ventas'] ) ? $report['fuente_ventas'] : 'csv';
+
         // Para la tabla: mostrar las 3 categorías (no solo lo parado).
         $por_estado = array( StockRotationReport::NO_ROTA => array(), StockRotationReport::LENTO => array(), StockRotationReport::OK => array() );
         foreach ( $report['items'] as $it ) { $por_estado[ $it['estado'] ][] = $it; }
@@ -162,9 +164,20 @@ trait RotacionTrait {
                     <?php if ( ! $tiene_inv ) : ?>
                         <div class="mm-empty-state">Carga primero las existencias (paso 1) para ver el stock parado. Si además cargas las ventas, sabrás hace cuánto no se vende cada producto.</div>
                     <?php else : ?>
-                        <?php if ( ! $tiene_ventas ) : ?>
-                            <div class="mm-safe-note" style="margin-bottom:12px;">Cargaste existencias pero aún no hay ventas: todo aparece como "no rota". Carga las ventas (paso 2) para distinguir lo que sí se mueve.</div>
+                        <?php if ( 'salidas_inventario' === $fuente_ventas ) : ?>
+                            <div class="mm-safe-note" style="margin-bottom:12px;">
+                                📊 <strong>Clasificación basada en la columna SALIDAS del inventario.</strong>
+                                <br>🔴 <strong>No rota</strong>: salidas = 0 (no se vendió nada en el periodo).
+                                <br>🟡 <strong>Lento</strong>: vendió algo pero menos del 20 % del stock disponible.
+                                <br>🟢 <strong>Rotando</strong>: vendió ≥ 20 % del stock disponible.
+                                <br><small>Para ver días exactos sin venta, carga también el CSV de ventas (paso 2).</small>
+                            </div>
+                        <?php else : ?>
+                            <div class="mm-safe-note" style="margin-bottom:12px;">
+                                📅 Clasificación basada en días desde la última venta registrada en el CSV de ventas.
+                            </div>
                         <?php endif; ?>
+
                         <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 14px;">
                             <button type="button" class="mm-rot-chip mm-mini-secondary is-on" data-filtro="todos">Todos</button>
                             <button type="button" class="mm-rot-chip mm-mini-secondary" data-filtro="no_rota">No rota</button>
