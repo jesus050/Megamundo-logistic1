@@ -187,43 +187,121 @@ trait RotacionTrait {
                             <button type="button" class="mm-rot-chip mm-mini-secondary" data-filtro="ok">Rotando</button>
                             <input type="search" id="mm-rot-buscar" class="mm-input" placeholder="Buscar por SKU o nombre…" style="max-width:260px; margin-left:auto;">
                         </div>
-                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+
+                        <style>
+                        /* Tabla completa: solo desktop */
+                        .mm-rot-table-wrap { overflow-x:auto; }
+                        .mm-rot-cards { display:none; }
+                        @media (max-width: 640px) {
+                            .mm-rot-table-wrap { display:none; }
+                            .mm-rot-cards { display:block; }
+                            .mm-rot-card {
+                                border-radius:10px;
+                                padding:12px 14px;
+                                margin-bottom:10px;
+                                border-left:4px solid #cbd5e1;
+                                background:#fff;
+                                box-shadow:0 1px 4px rgba(0,0,0,.07);
+                            }
+                            .mm-rot-card.estado-no_rota { border-left-color:#dc2626; background:#fff8f8; }
+                            .mm-rot-card.estado-lento   { border-left-color:#f59e0b; background:#fffdf0; }
+                            .mm-rot-card.estado-ok      { border-left-color:#16a34a; background:#f0fdf4; }
+                            .mm-rot-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px; }
+                            .mm-rot-card-sku  { font-family:monospace; font-size:11px; color:#64748b; }
+                            .mm-rot-card-nombre { font-size:13px; font-weight:600; color:#1e293b; margin:2px 0 6px; }
+                            .mm-rot-card-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+                            .mm-rot-card-stat { text-align:center; }
+                            .mm-rot-card-stat small { display:block; font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:.3px; }
+                            .mm-rot-card-stat strong { display:block; font-size:14px; font-weight:700; color:#1e293b; }
+                            .mm-rot-badge { display:inline-block; font-size:11px; padding:2px 10px; border-radius:999px; font-weight:600; }
+                            #mm-rot-buscar { max-width:100% !important; margin-left:0 !important; }
+                        }
+                        </style>
+
+                        <!-- TABLA (desktop) -->
+                        <div class="mm-rot-table-wrap">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:700px;">
                             <thead>
-                                <tr style="text-align:left; border-bottom:1px solid var(--mm-line,#e2e8f0);">
-                                    <th style="padding:8px 6px;">SKU</th>
-                                    <th style="padding:8px 6px;">Producto</th>
-                                    <th style="padding:8px 6px; text-align:right;" title="Saldo inicial del periodo">Viene</th>
-                                    <th style="padding:8px 6px; text-align:right;" title="Unidades ingresadas al bodegaje">Entradas</th>
-                                    <th style="padding:8px 6px; text-align:right;" title="Unidades vendidas / despachadas">Salidas</th>
-                                    <th style="padding:8px 6px; text-align:right;" title="Existencia actual = Viene + Entradas − Salidas">Existencia</th>
-                                    <th style="padding:8px 6px;">Última venta</th>
-                                    <th style="padding:8px 6px; text-align:right;">Días sin venta</th>
-                                    <th style="padding:8px 6px;">Estado</th>
+                                <tr style="text-align:left; border-bottom:2px solid var(--mm-line,#e2e8f0); background:#f8fafc;">
+                                    <th style="padding:8px 8px; white-space:nowrap;">SKU</th>
+                                    <th style="padding:8px 8px;">Producto</th>
+                                    <th style="padding:8px 8px; text-align:right; white-space:nowrap;" title="Saldo inicial del periodo">Viene</th>
+                                    <th style="padding:8px 8px; text-align:right; white-space:nowrap;" title="Unidades que ingresaron">Entradas</th>
+                                    <th style="padding:8px 8px; text-align:right; white-space:nowrap;" title="Unidades vendidas">Salidas</th>
+                                    <th style="padding:8px 8px; text-align:right; white-space:nowrap;" title="Existencia = Viene + Entradas − Salidas">Existencia</th>
+                                    <th style="padding:8px 8px; white-space:nowrap;">Última venta</th>
+                                    <th style="padding:8px 8px; text-align:right; white-space:nowrap;">Días</th>
+                                    <th style="padding:8px 8px;">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ( $items as $it ) :
                                     $badge = array(
                                         StockRotationReport::NO_ROTA => array( 'No rota', '#fef2f2', '#b91c1c' ),
-                                        StockRotationReport::LENTO   => array( 'Lento', '#fffbeb', '#b45309' ),
+                                        StockRotationReport::LENTO   => array( 'Lento',   '#fffbeb', '#b45309' ),
                                         StockRotationReport::OK      => array( 'Rotando', '#f0fdf4', '#15803d' ),
                                     );
                                     $b = $badge[ $it['estado'] ] ?? array( $it['estado'], '#f1f5f9', '#475569' );
                                     ?>
                                     <tr class="mm-rot-row" data-estado="<?php echo esc_attr( $it['estado'] ); ?>" data-buscar="<?php echo esc_attr( strtolower( $it['sku'] . ' ' . $it['nombre'] ) ); ?>" style="border-bottom:1px solid var(--mm-line,#eef2f7);">
-                                        <td style="padding:8px 6px; font-family:monospace;"><?php echo esc_html( $it['sku'] ); ?></td>
-                                        <td style="padding:8px 6px;"><?php echo esc_html( $it['nombre'] ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['viene'] ?? 0 ) ) ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['entradas'] ?? 0 ) ) ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['salidas'] ?? 0 ) ) ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right; font-weight:600;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></td>
-                                        <td style="padding:8px 6px;"><?php echo esc_html( $it['ultima_venta'] ?: 'Sin ventas' ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo null === $it['dias_sin_venta'] ? '&mdash;' : esc_html( $it['dias_sin_venta'] ); ?></td>
-                                        <td style="padding:8px 6px;"><span style="font-size:11px; padding:2px 9px; border-radius:999px; background:<?php echo esc_attr( $b[1] ); ?>; color:<?php echo esc_attr( $b[2] ); ?>;"><?php echo esc_html( $b[0] ); ?></span></td>
+                                        <td style="padding:7px 8px; font-family:monospace; font-size:12px; color:#475569;"><?php echo esc_html( $it['sku'] ); ?></td>
+                                        <td style="padding:7px 8px;"><?php echo esc_html( $it['nombre'] ); ?></td>
+                                        <td style="padding:7px 8px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['viene']    ?? 0 ) ) ); ?></td>
+                                        <td style="padding:7px 8px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['entradas'] ?? 0 ) ) ); ?></td>
+                                        <td style="padding:7px 8px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['salidas']  ?? 0 ) ) ); ?></td>
+                                        <td style="padding:7px 8px; text-align:right; font-weight:700;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></td>
+                                        <td style="padding:7px 8px; font-size:12px;"><?php echo esc_html( $it['ultima_venta'] ?: '—' ); ?></td>
+                                        <td style="padding:7px 8px; text-align:right;"><?php echo null === $it['dias_sin_venta'] ? '—' : esc_html( $it['dias_sin_venta'] ); ?></td>
+                                        <td style="padding:7px 8px;"><span style="font-size:11px; padding:2px 9px; border-radius:999px; background:<?php echo esc_attr( $b[1] ); ?>; color:<?php echo esc_attr( $b[2] ); ?>; font-weight:600;"><?php echo esc_html( $b[0] ); ?></span></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        </div>
+
+                        <!-- TARJETAS (móvil) -->
+                        <div class="mm-rot-cards">
+                        <?php foreach ( $items as $it ) :
+                            $badge = array(
+                                StockRotationReport::NO_ROTA => array( 'No rota', '#dc2626' ),
+                                StockRotationReport::LENTO   => array( 'Lento',   '#b45309' ),
+                                StockRotationReport::OK      => array( 'Rotando', '#15803d' ),
+                            );
+                            $bm = $badge[ $it['estado'] ] ?? array( $it['estado'], '#475569' );
+                            ?>
+                            <div class="mm-rot-row mm-rot-card estado-<?php echo esc_attr( $it['estado'] ); ?>"
+                                 data-estado="<?php echo esc_attr( $it['estado'] ); ?>"
+                                 data-buscar="<?php echo esc_attr( strtolower( $it['sku'] . ' ' . $it['nombre'] ) ); ?>">
+                                <div class="mm-rot-card-header">
+                                    <div>
+                                        <div class="mm-rot-card-sku"><?php echo esc_html( $it['sku'] ); ?></div>
+                                        <div class="mm-rot-card-nombre"><?php echo esc_html( $it['nombre'] ); ?></div>
+                                    </div>
+                                    <span class="mm-rot-badge" style="color:<?php echo esc_attr( $bm[1] ); ?>; background:<?php echo 'no_rota' === $it['estado'] ? '#fef2f2' : ( 'lento' === $it['estado'] ? '#fffbeb' : '#f0fdf4' ); ?>; white-space:nowrap; flex-shrink:0;">
+                                        <?php echo esc_html( $bm[0] ); ?>
+                                    </span>
+                                </div>
+                                <div class="mm-rot-card-grid">
+                                    <div class="mm-rot-card-stat">
+                                        <small>Viene</small>
+                                        <strong><?php echo esc_html( number_format_i18n( (int) ( $it['viene'] ?? 0 ) ) ); ?></strong>
+                                    </div>
+                                    <div class="mm-rot-card-stat">
+                                        <small>Entradas</small>
+                                        <strong><?php echo esc_html( number_format_i18n( (int) ( $it['entradas'] ?? 0 ) ) ); ?></strong>
+                                    </div>
+                                    <div class="mm-rot-card-stat">
+                                        <small>Salidas</small>
+                                        <strong><?php echo esc_html( number_format_i18n( (int) ( $it['salidas'] ?? 0 ) ) ); ?></strong>
+                                    </div>
+                                    <div class="mm-rot-card-stat">
+                                        <small>Existencia</small>
+                                        <strong style="color:<?php echo esc_attr( $bm[1] ); ?>;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
                 </div>
             </section>
