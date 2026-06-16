@@ -84,11 +84,13 @@ trait RotacionTrait {
         // Para la tabla: mostrar las 3 categorías (no solo lo parado).
         $por_estado = array( StockRotationReport::NO_ROTA => array(), StockRotationReport::LENTO => array(), StockRotationReport::OK => array() );
         foreach ( $report['items'] as $it ) { $por_estado[ $it['estado'] ][] = $it; }
+        // Todos los productos: No rota primero, luego Lento, luego Rotando.
         $items = array_merge(
-            array_slice( $por_estado[ StockRotationReport::NO_ROTA ], 0, 150 ),
-            array_slice( $por_estado[ StockRotationReport::LENTO ], 0, 100 ),
-            array_slice( $por_estado[ StockRotationReport::OK ], 0, 100 )
+            $por_estado[ StockRotationReport::NO_ROTA ],
+            $por_estado[ StockRotationReport::LENTO ],
+            $por_estado[ StockRotationReport::OK ]
         );
+
         $tot = max( 1, (int) $sum['total'] );
         $pct_no = (int) round( $sum[ StockRotationReport::NO_ROTA ] / $tot * 100 );
         $pct_le = (int) round( $sum[ StockRotationReport::LENTO ] / $tot * 100 );
