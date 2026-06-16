@@ -89,6 +89,8 @@ class ScannerViewController {
         add_action( 'wp_ajax_mm_app_cerrar_pedido_compra', array( $this, 'ajax_cerrar_pedido_compra' ) );
         add_action( 'wp_ajax_mm_app_rotacion_preview', array( $this, 'ajax_rotacion_importar_preview' ) );
         add_action( 'wp_ajax_mm_app_rotacion_confirmar', array( $this, 'ajax_rotacion_importar_confirmar' ) );
+        add_action( 'wp_ajax_mm_app_rotacion_inv_preview', array( $this, 'ajax_rotacion_inv_preview' ) );
+        add_action( 'wp_ajax_mm_app_rotacion_inv_confirmar', array( $this, 'ajax_rotacion_inv_confirmar' ) );
     }
 
     private function plugin_file() {

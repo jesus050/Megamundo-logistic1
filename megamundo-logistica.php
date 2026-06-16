@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MegaMundo - Control Logístico e Inventario
  * Description: Sistema modular para gestión de bodega por lotes con flujo de aprobación, IA y tickets automáticos.
- * Version: 4.8.4
+ * Version: 4.8.5
  * Author: Jesus Diaz | Creative Invasion
  * License: GPL2
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'MM_LOGISTICA_VERSION', '4.8.4' );
+define( 'MM_LOGISTICA_VERSION', '4.8.5' );
 define( 'MM_LOGISTICA_PATH', plugin_dir_path( __FILE__ ) );
 
 // Cargar Autoloader de PSR-4

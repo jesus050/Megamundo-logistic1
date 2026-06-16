@@ -82,4 +82,25 @@ class SalesRepository {
         $rows = $wpdb->get_results( $sql, ARRAY_A );
         return is_array( $rows ) ? $rows : array();
     }
+
+    /** Mapa sku => última fecha de venta, para cruzar con existencias. */
+    public function get_last_sale_map() {
+        global $wpdb;
+        $rows = $wpdb->get_results(
+            "SELECT sku, MAX(fecha) AS ultima FROM {$this->table()} GROUP BY sku",
+            ARRAY_A
+        );
+        $map = array();
+        if ( is_array( $rows ) ) {
+            foreach ( $rows as $r ) {
+                $map[ (string) $r['sku'] ] = (string) $r['ultima'];
+            }
+        }
+        return $map;
+    }
+
+    public function has_any() {
+        global $wpdb;
+        return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$this->table()}" ) > 0;
+    }
 }
