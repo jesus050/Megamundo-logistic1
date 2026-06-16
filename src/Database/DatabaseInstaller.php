@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 class DatabaseInstaller {
 
-    private $db_version = '3.2.0';
+    private $db_version = '3.3.0';
 
     public function get_db_version() {
         return $this->db_version;
@@ -77,11 +77,18 @@ class DatabaseInstaller {
 
         // Inventario importado desde Mekano: base para el análisis de rotación.
         // Una fila por SKU; reimportar actualiza (UNIQUE en sku).
+        // viene     = saldo inicial del periodo (lo que había antes)
+        // entradas  = unidades que ingresaron al bodegaje en el periodo
+        // salidas   = unidades vendidas / despachadas en el periodo
+        // stock     = EXISTENCIA actual = viene + entradas − salidas
         $sql_inv = "CREATE TABLE $table_inv (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             sku varchar(191) DEFAULT '' NOT NULL,
             nombre varchar(255) DEFAULT '' NOT NULL,
             linea varchar(191) DEFAULT '' NOT NULL,
+            viene int(11) DEFAULT 0 NOT NULL,
+            entradas int(11) DEFAULT 0 NOT NULL,
+            salidas int(11) DEFAULT 0 NOT NULL,
             stock int(11) DEFAULT 0 NOT NULL,
             costo decimal(12,2) DEFAULT 0.00 NOT NULL,
             ultima_venta date DEFAULT NULL,

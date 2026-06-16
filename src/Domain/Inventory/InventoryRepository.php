@@ -7,8 +7,11 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * Acceso a la tabla wp_mm_inventario (existencias importadas de Mekano).
  * Una fila por SKU; reimportar actualiza (UNIQUE en sku).
  *
- * Por ahora solo se usa stock (la valoración en $ queda para cuando se cargue
- * un reporte con costo); el costo se guarda en 0.
+ * Columnas de Mekano que guardamos:
+ *   viene    = saldo inicial del periodo
+ *   entradas = unidades que ingresaron al bodegaje
+ *   salidas  = unidades vendidas / despachadas
+ *   stock    = EXISTENCIA = viene + entradas − salidas
  */
 class InventoryRepository {
 
@@ -28,20 +31,28 @@ class InventoryRepository {
         return is_array( $rows ) ? array_map( 'strval', $rows ) : array();
     }
 
-    /** Todas las filas con stock, para el análisis de rotación. */
+    /**
+     * Filas con stock > 0 para el análisis de rotación.
+     * Incluye viene, entradas y salidas para mostrar el detalle completo.
+     */
     public function get_stock_rows() {
         global $wpdb;
         $rows = $wpdb->get_results(
-            "SELECT sku, nombre, stock FROM {$this->table()} WHERE stock > 0",
+            "SELECT sku, nombre, viene, entradas, salidas, stock
+             FROM {$this->table()}
+             WHERE stock > 0
+             ORDER BY sku ASC",
             ARRAY_A
         );
         return is_array( $rows ) ? $rows : array();
     }
 
     /**
-     * Guarda un lote de filas de existencias por INSERT múltiple (rápido para
-     * los ~20k SKU del reporte). $rows: [{sku, nombre, stock}, ...].
-     * Inserta en bloques y reemplaza por SKU. Devuelve cuántas guardó.
+     * Guarda un lote de filas de existencias en bloques rápidos (INSERT múltiple).
+     * Si el SKU ya existe, actualiza todos los campos importados.
+     *
+     * @param array $rows  [{sku, nombre, viene, entradas, salidas, stock}, ...]
+     * @param int   $chunk Tamaño del lote de INSERT.
      */
     public function bulk_replace( array $rows, $chunk = 500 ) {
         global $wpdb;
@@ -52,26 +63,37 @@ class InventoryRepository {
         foreach ( array_chunk( $rows, $chunk ) as $batch ) {
             $values = array();
             $params = array();
+
             foreach ( $batch as $r ) {
                 $sku = isset( $r['sku'] ) ? (string) $r['sku'] : '';
-                if ( '' === $sku ) {
-                    continue;
-                }
-                $values[] = '(%s, %s, %d, 0, %s)';
+                if ( '' === $sku ) { continue; }
+
+                $values[] = '(%s, %s, %d, %d, %d, %d, 0, %s)';
                 $params[] = $sku;
-                $params[] = (string) ( $r['nombre'] ?? '' );
-                $params[] = (int) ( $r['stock'] ?? 0 );
+                $params[] = (string) ( isset( $r['nombre'] )   ? $r['nombre']   : '' );
+                $params[] = (int)    ( isset( $r['viene'] )    ? $r['viene']    : 0 );
+                $params[] = (int)    ( isset( $r['entradas'] ) ? $r['entradas'] : 0 );
+                $params[] = (int)    ( isset( $r['salidas'] )  ? $r['salidas']  : 0 );
+                $params[] = (int)    ( isset( $r['stock'] )    ? $r['stock']    : 0 );
                 $params[] = $now;
             }
-            if ( empty( $values ) ) {
-                continue;
-            }
-            $sql = "INSERT INTO $table (sku, nombre, stock, costo, importado_en) VALUES "
+
+            if ( empty( $values ) ) { continue; }
+
+            $sql = "INSERT INTO $table (sku, nombre, viene, entradas, salidas, stock, costo, importado_en) VALUES "
                 . implode( ', ', $values )
-                . " ON DUPLICATE KEY UPDATE nombre = VALUES(nombre), stock = VALUES(stock), importado_en = VALUES(importado_en)";
+                . " ON DUPLICATE KEY UPDATE
+                    nombre       = VALUES(nombre),
+                    viene        = VALUES(viene),
+                    entradas     = VALUES(entradas),
+                    salidas      = VALUES(salidas),
+                    stock        = VALUES(stock),
+                    importado_en = VALUES(importado_en)";
+
             $wpdb->query( $wpdb->prepare( $sql, $params ) );
             $saved += count( $values );
         }
+
         return $saved;
     }
 }

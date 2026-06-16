@@ -177,7 +177,10 @@ trait RotacionTrait {
                                 <tr style="text-align:left; border-bottom:1px solid var(--mm-line,#e2e8f0);">
                                     <th style="padding:8px 6px;">SKU</th>
                                     <th style="padding:8px 6px;">Producto</th>
-                                    <th style="padding:8px 6px; text-align:right;">Stock</th>
+                                    <th style="padding:8px 6px; text-align:right;" title="Saldo inicial del periodo">Viene</th>
+                                    <th style="padding:8px 6px; text-align:right;" title="Unidades ingresadas al bodegaje">Entradas</th>
+                                    <th style="padding:8px 6px; text-align:right;" title="Unidades vendidas / despachadas">Salidas</th>
+                                    <th style="padding:8px 6px; text-align:right;" title="Existencia actual = Viene + Entradas − Salidas">Existencia</th>
                                     <th style="padding:8px 6px;">Última venta</th>
                                     <th style="padding:8px 6px; text-align:right;">Días sin venta</th>
                                     <th style="padding:8px 6px;">Estado</th>
@@ -195,9 +198,12 @@ trait RotacionTrait {
                                     <tr class="mm-rot-row" data-estado="<?php echo esc_attr( $it['estado'] ); ?>" data-buscar="<?php echo esc_attr( strtolower( $it['sku'] . ' ' . $it['nombre'] ) ); ?>" style="border-bottom:1px solid var(--mm-line,#eef2f7);">
                                         <td style="padding:8px 6px; font-family:monospace;"><?php echo esc_html( $it['sku'] ); ?></td>
                                         <td style="padding:8px 6px;"><?php echo esc_html( $it['nombre'] ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></td>
+                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['viene'] ?? 0 ) ) ); ?></td>
+                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['entradas'] ?? 0 ) ) ); ?></td>
+                                        <td style="padding:8px 6px; text-align:right;"><?php echo esc_html( number_format_i18n( (int) ( $it['salidas'] ?? 0 ) ) ); ?></td>
+                                        <td style="padding:8px 6px; text-align:right; font-weight:600;"><?php echo esc_html( number_format_i18n( $it['stock'] ) ); ?></td>
                                         <td style="padding:8px 6px;"><?php echo esc_html( $it['ultima_venta'] ?: 'Sin ventas' ); ?></td>
-                                        <td style="padding:8px 6px; text-align:right;"><?php echo null === $it['dias_sin_venta'] ? '—' : esc_html( $it['dias_sin_venta'] ); ?></td>
+                                        <td style="padding:8px 6px; text-align:right;"><?php echo null === $it['dias_sin_venta'] ? '&mdash;' : esc_html( $it['dias_sin_venta'] ); ?></td>
                                         <td style="padding:8px 6px;"><span style="font-size:11px; padding:2px 9px; border-radius:999px; background:<?php echo esc_attr( $b[1] ); ?>; color:<?php echo esc_attr( $b[2] ); ?>;"><?php echo esc_html( $b[0] ); ?></span></td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -7,16 +7,27 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * Importa el reporte de EXISTENCIAS de Mekano (CSV) para conocer el stock
  * actual por referencia. Lógica pura y testeable.
  *
- * Columnas reales del reporte: REFERENCIA (a veces el valor cae en la columna
- * contigua, con encabezado vacío), NOMBRE REFERENCIA, VIENE, ENTRADAS,
- * SALIDAS, EXISTENCIA. Solo nos interesan sku, nombre y existencia (stock).
+ * Columnas reales del reporte de Mekano:
+ *   REFERENCIA  → sku
+ *   NOMBRE REFERENCIA → nombre
+ *   VIENE       → viene (saldo inicial del periodo)
+ *   ENTRADAS    → entradas (productos ingresados al bodegaje)
+ *   SALIDAS     → salidas (productos vendidos / despachados)
+ *   EXISTENCIA  → stock (inventario actual = viene + entradas − salidas)
+ *
+ * Los números en Mekano usan separador de miles con punto y decimal con coma
+ * (formato colombiano): p. ej. "1.256,00" = 1256 unidades. El método to_int()
+ * lo interpreta correctamente; NO elimina los decimales sin leerlos primero.
  */
 class MekanoInventoryImporter {
 
     const FIELD_SYNONYMS = array(
-        'sku'    => array( 'referencia', 'sku', 'codigo', 'cod', 'ref' ),
-        'nombre' => array( 'nombre referencia', 'nombre', 'descripcion', 'producto' ),
-        'stock'  => array( 'existencia', 'existencias', 'saldo', 'stock', 'disponible' ),
+        'sku'      => array( 'referencia', 'sku', 'codigo', 'cod', 'ref', 'codigo producto' ),
+        'nombre'   => array( 'nombre referencia', 'nombre', 'descripcion', 'producto', 'descripcion producto' ),
+        'viene'    => array( 'viene', 'saldo anterior', 'anterior', 'saldo inicial', 'saldo ini' ),
+        'entradas' => array( 'entradas', 'entrada', 'compras', 'ingresos', 'ingreso' ),
+        'salidas'  => array( 'salidas', 'salida', 'ventas', 'despachos', 'despacho', 'egresos' ),
+        'stock'    => array( 'existencia', 'existencias', 'saldo', 'saldo final', 'stock', 'disponible', 'actual' ),
     );
 
     const REQUIRED = array( 'sku', 'stock' );
@@ -54,10 +65,9 @@ class MekanoInventoryImporter {
     }
 
     /**
-     * Sugiere el mapeo campo => índice. Recibe filas de muestra para corregir
-     * el caso de la columna REFERENCIA cuyo valor cae en la columna contigua
-     * (encabezado vacío): si la columna mapeada para sku viene vacía en los
-     * datos, busca la mejor columna por contenido.
+     * Sugiere el mapeo campo => índice de columna.
+     * Incluye corrección automática del SKU cuando Mekano salta el valor a la
+     * columna contigua (encabezado vacío).
      */
     public function suggest_mapping( array $headers, array $sample_rows = array() ) {
         $norm = array();
@@ -78,11 +88,14 @@ class MekanoInventoryImporter {
         }
 
         // Corrección del SKU: si la columna mapeada está vacía en la muestra,
-        // elige la columna (distinta de nombre/stock) con más códigos no vacíos.
+        // busca la mejor columna por contenido (alfanumérico corto).
         if ( ! empty( $sample_rows ) ) {
-            $sku_idx = $mapping['sku'] ?? null;
+            $sku_idx = isset( $mapping['sku'] ) ? $mapping['sku'] : null;
             if ( null === $sku_idx || ! $this->column_has_data( $sample_rows, $sku_idx ) ) {
-                $excluir = array( $mapping['nombre'] ?? -1, $mapping['stock'] ?? -1 );
+                $excluir = array(
+                    isset( $mapping['nombre'] ) ? $mapping['nombre'] : -1,
+                    isset( $mapping['stock'] )  ? $mapping['stock']  : -1,
+                );
                 $mejor = $this->best_code_column( $sample_rows, $excluir );
                 if ( null !== $mejor ) {
                     $mapping['sku'] = $mejor;
@@ -120,29 +133,53 @@ class MekanoInventoryImporter {
     }
 
     /**
-     * Vista previa: agrega por SKU (una fila por referencia; si se repite, gana
-     * la última existencia) y reporta errores y conteos.
+     * Construye la vista previa: agrega por SKU e incluye TODAS las columnas
+     * del reporte (viene, entradas, salidas, stock/existencia).
+     *
+     * @param array $data_rows   Filas de datos (sin cabecera).
+     * @param array $mapping     Mapeo campo => índice de columna.
+     * @param array $existing_skus  SKUs ya guardados (para reportar nuevos/actualizar).
      */
     public function build_preview( array $data_rows, array $mapping, array $existing_skus = array() ) {
         foreach ( self::REQUIRED as $req ) {
             if ( ! isset( $mapping[ $req ] ) ) {
-                return array( 'ok' => false, 'message' => 'Falta mapear el campo obligatorio: ' . $req, 'rows' => array(), 'summary' => array() );
+                return array(
+                    'ok'      => false,
+                    'message' => 'No se encontró la columna obligatoria: ' . strtoupper( $req )
+                               . '. Asegúrate de exportar el reporte de existencias de Mekano con columnas: '
+                               . 'REFERENCIA, NOMBRE REFERENCIA, VIENE, ENTRADAS, SALIDAS, EXISTENCIA.',
+                    'rows'    => array(),
+                    'summary' => array(),
+                );
             }
         }
 
         $existing = array_fill_keys( array_map( 'strval', $existing_skus ), true );
-        $por_sku = array();
-        $errores = 0;
-        $lineas = 0;
+        $por_sku  = array();
+        $errores  = 0;
+        $lineas   = 0;
 
         foreach ( $data_rows as $cells ) {
             if ( ! is_array( $cells ) ) { continue; }
             $lineas++;
-            $sku   = isset( $cells[ $mapping['sku'] ] ) ? trim( (string) $cells[ $mapping['sku'] ] ) : '';
-            $stock = isset( $cells[ $mapping['stock'] ] ) ? $this->to_int( $cells[ $mapping['stock'] ] ) : 0;
-            $nombre = isset( $mapping['nombre'], $cells[ $mapping['nombre'] ] ) ? trim( (string) $cells[ $mapping['nombre'] ] ) : '';
+
+            $sku = isset( $cells[ $mapping['sku'] ] ) ? trim( (string) $cells[ $mapping['sku'] ] ) : '';
             if ( '' === $sku ) { $errores++; continue; }
-            $por_sku[ $sku ] = array( 'sku' => $sku, 'nombre' => $nombre, 'stock' => $stock );
+
+            $nombre   = isset( $mapping['nombre'],   $cells[ $mapping['nombre'] ] )   ? trim( (string) $cells[ $mapping['nombre'] ] )   : '';
+            $viene    = isset( $mapping['viene'],    $cells[ $mapping['viene'] ] )    ? $this->to_int( $cells[ $mapping['viene'] ] )    : 0;
+            $entradas = isset( $mapping['entradas'], $cells[ $mapping['entradas'] ] ) ? $this->to_int( $cells[ $mapping['entradas'] ] ) : 0;
+            $salidas  = isset( $mapping['salidas'],  $cells[ $mapping['salidas'] ] )  ? $this->to_int( $cells[ $mapping['salidas'] ] )  : 0;
+            $stock    = $this->to_int( $cells[ $mapping['stock'] ] );
+
+            $por_sku[ $sku ] = array(
+                'sku'      => $sku,
+                'nombre'   => $nombre,
+                'viene'    => $viene,
+                'entradas' => $entradas,
+                'salidas'  => $salidas,
+                'stock'    => $stock,
+            );
         }
 
         $rows = array_values( $por_sku );
@@ -157,23 +194,71 @@ class MekanoInventoryImporter {
             'message' => '',
             'rows'    => $rows,
             'summary' => array(
-                'lineas'         => $lineas,
-                'con_error'      => $errores,
-                'skus'           => count( $rows ),
-                'con_stock'      => $con_stock,
-                'nuevos'         => $nuevos,
-                'actualizar'     => $actualizar,
+                'lineas'     => $lineas,
+                'con_error'  => $errores,
+                'skus'       => count( $rows ),
+                'con_stock'  => $con_stock,
+                'nuevos'     => $nuevos,
+                'actualizar' => $actualizar,
             ),
         );
     }
 
-    /** Entero tolerante a separadores de miles; negativos -> 0 (dato sucio). */
+    /**
+     * Convierte un valor numérico de Mekano (que puede venir con separadores
+     * de miles y decimales al estilo colombiano) a entero.
+     *
+     * Formatos soportados:
+     *   "256,00"      → 256   (coma = separador decimal)
+     *   "1.256,00"    → 1256  (punto = miles, coma = decimal)
+     *   "1,256.00"    → 1256  (coma = miles, punto = decimal)
+     *   "256"         → 256   (sin separadores)
+     *   "$256,00"     → 256   (símbolo de moneda ignorado)
+     *   "-10,00"      → 0     (negativos → 0, dato sucio)
+     */
     public function to_int( $value ) {
         $s = trim( (string) $value );
-        $neg = ( 0 === strpos( $s, '-' ) );
-        $s = preg_replace( '/[^0-9]/', '', $s );
+
+        // Quitar símbolos de moneda, espacios y caracteres no numéricos excepto , . -
+        $s = preg_replace( '/[^0-9,.\-]/', '', $s );
         if ( '' === $s ) { return 0; }
-        $n = (int) $s;
-        return $neg ? 0 : $n;
+
+        $neg = ( 0 === strpos( $s, '-' ) );
+
+        $pos_coma  = strrpos( $s, ',' );
+        $pos_punto = strrpos( $s, '.' );
+
+        if ( false !== $pos_coma && false !== $pos_punto ) {
+            // Ambos presentes: el último es el separador decimal.
+            if ( $pos_coma > $pos_punto ) {
+                // Estilo Colombia: 1.256,00 → punto = miles, coma = decimal
+                $s = str_replace( '.', '', $s );        // quitar separador de miles
+                $s = str_replace( ',', '.', $s );       // normalizar decimal
+            } else {
+                // Estilo anglosajón: 1,256.00 → coma = miles, punto = decimal
+                $s = str_replace( ',', '', $s );        // quitar separador de miles
+            }
+        } elseif ( false !== $pos_coma ) {
+            // Solo coma: decidir si es decimal o miles según dígitos que le siguen.
+            $decimales = strlen( $s ) - $pos_coma - 1;
+            if ( $decimales <= 2 ) {
+                // Parece decimal (256,00 → 256)
+                $s = str_replace( ',', '.', $s );
+            } else {
+                // Parece separador de miles (1,256 → 1256)
+                $s = str_replace( ',', '', $s );
+            }
+        } elseif ( false !== $pos_punto ) {
+            // Solo punto: ídem.
+            $decimales = strlen( $s ) - $pos_punto - 1;
+            if ( $decimales > 2 ) {
+                // Separador de miles: 1.256 → 1256
+                $s = str_replace( '.', '', $s );
+            }
+            // Si son ≤ 2 decimales, floatval + intval lo recorta: 256.00 → 256
+        }
+
+        $n = (int) floatval( $s );
+        return ( $neg || $n < 0 ) ? 0 : $n;
     }
 }

@@ -65,6 +65,9 @@ class StockRotationReport {
             $out[] = array(
                 'sku'            => $sku,
                 'nombre'         => (string) ( $row['nombre'] ?? '' ),
+                'viene'          => (int) ( $row['viene']    ?? 0 ),
+                'entradas'       => (int) ( $row['entradas'] ?? 0 ),
+                'salidas'        => (int) ( $row['salidas']  ?? 0 ),
                 'stock'          => $stock,
                 'ultima_venta'   => $ultima,
                 'dias_sin_venta' => $dias,
