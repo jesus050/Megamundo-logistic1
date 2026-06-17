@@ -373,17 +373,74 @@ trait PedidosTrait {
                                 <span>Agrega productos, cantidades y datos internos. Bodega no verá costos ni precios.</span>
                             </div>
 
+                            <style>
+                            /* ── Tabla de productos: desktop ─────────────────────────── */
+                            .mm-pedido-productos-table-wrap { overflow-x:auto; }
+                            .mm-pedido-productos-table { width:100%; border-collapse:collapse; font-size:13px; min-width:680px; }
+                            .mm-pedido-productos-table th { padding:8px 6px; text-align:left; background:#f8fafc; border-bottom:2px solid #e2e8f0; white-space:nowrap; font-size:12px; color:#475569; }
+                            .mm-pedido-productos-table td { padding:6px 4px; border-bottom:1px solid #f1f5f9; vertical-align:top; }
+                            .mm-pedido-productos-table .mm-input { font-size:12px; padding:5px 7px; min-width:0; }
+
+                            /* Celda imagen */
+                            .mm-pedido-image-cell { width:90px; text-align:center; }
+                            .mm-img-upload-label {
+                                display:flex; flex-direction:column; align-items:center; justify-content:center;
+                                gap:4px; cursor:pointer; border:2px dashed #cbd5e1; border-radius:8px;
+                                padding:6px 4px; min-height:60px; background:#f8fafc;
+                                transition:border-color .2s, background .2s; font-size:11px; color:#64748b;
+                            }
+                            .mm-img-upload-label:hover { border-color:#6366f1; background:#eef2ff; color:#4f46e5; }
+                            .mm-img-upload-label input[type="file"] { display:none; }
+                            .mm-img-upload-label .mm-img-icon { font-size:20px; line-height:1; }
+                            .mm-pedido-image-preview {
+                                width:56px; height:56px; object-fit:cover; border-radius:6px;
+                                display:none; border:1px solid #e2e8f0; margin:0 auto;
+                            }
+                            .mm-pedido-image-preview.has-image { display:block; }
+
+                            /* ── Móvil: ocultar tabla, mostrar cards de producto ─────── */
+                            @media (max-width:640px) {
+                                .mm-pedido-productos-table-wrap { display:none; }
+                                .mm-pedido-productos-cards { display:block !important; }
+                                .mm-pedido-prod-card {
+                                    border:1px solid #e2e8f0; border-radius:12px; padding:14px;
+                                    margin-bottom:12px; background:#fff;
+                                    box-shadow:0 1px 4px rgba(0,0,0,.06);
+                                    position:relative;
+                                }
+                                .mm-pedido-prod-card-header {
+                                    display:flex; gap:10px; align-items:flex-start; margin-bottom:10px;
+                                }
+                                .mm-pedido-prod-card-img {
+                                    flex-shrink:0; width:72px;
+                                }
+                                .mm-pedido-prod-card-fields { flex:1; display:grid; gap:6px; }
+                                .mm-pedido-prod-card-row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+                                .mm-pedido-prod-card-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+                                .mm-pedido-prod-card label { font-size:11px; color:#64748b; display:block; }
+                                .mm-pedido-prod-card .mm-input { font-size:13px; }
+                                .mm-pedido-prod-card .mm-img-upload-label { min-height:72px; width:72px; }
+                                .mm-pedido-prod-card .mm-pedido-image-preview { width:72px; height:72px; }
+                                .mm-remove-pedido-product-row {
+                                    position:absolute; top:10px; right:10px;
+                                    font-size:11px; padding:3px 8px;
+                                }
+                            }
+                            .mm-pedido-productos-cards { display:none; }
+                            </style>
+
+                            <!-- TABLA (desktop) -->
                             <div class="mm-pedido-productos-table-wrap">
                                 <table class="mm-pedido-productos-table">
                                     <thead>
                                         <tr>
                                             <th>Código / SKU</th>
                                             <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Costo interno</th>
-                                            <th>Precio interno</th>
+                                            <th>Cant.</th>
+                                            <th>Costo</th>
+                                            <th>Precio</th>
                                             <th>Observación</th>
-                                            <th>Imagen</th>
+                                            <th>Foto</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -391,25 +448,72 @@ trait PedidosTrait {
                                         <tr>
                                             <td><input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770..."></td>
                                             <td><input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto"></td>
-                                            <td><input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0"></td>
-                                            <td><input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="Privado"></td>
-                                            <td><input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="Privado"></td>
-                                            <td><input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, referencia, nota"></td>
-                                            <td class="mm-pedido-image-cell"><input class="mm-input mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="mm-pedido-image-preview">Sin imagen</div></td>
-                                            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">Eliminar</button></td>
+                                            <td><input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0" style="width:60px;"></td>
+                                            <td><input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="$" style="width:80px;"></td>
+                                            <td><input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="$" style="width:80px;"></td>
+                                            <td><input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, ref…"></td>
+                                            <td class="mm-pedido-image-cell">
+                                                <label class="mm-img-upload-label" title="Subir foto del producto">
+                                                    <span class="mm-img-icon">📷</span>
+                                                    <span>Foto</span>
+                                                    <input class="mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment">
+                                                </label>
+                                                <img class="mm-pedido-image-preview" src="" alt="Vista previa">
+                                            </td>
+                                            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">✕</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <button type="button" class="mm-mini-secondary mm-add-pedido-product-row">+ Agregar producto</button>
+                            <!-- TARJETAS (móvil) -->
+                            <div class="mm-pedido-productos-cards" id="mm-pedido-prod-cards-wrap">
+                                <div class="mm-pedido-prod-card">
+                                    <div class="mm-pedido-prod-card-header">
+                                        <div class="mm-pedido-prod-card-img">
+                                            <label class="mm-img-upload-label" title="Subir foto">
+                                                <span class="mm-img-icon">📷</span>
+                                                <span>Foto</span>
+                                                <input class="mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment">
+                                            </label>
+                                            <img class="mm-pedido-image-preview" src="" alt="Vista previa">
+                                        </div>
+                                        <div class="mm-pedido-prod-card-fields">
+                                            <label>Código / SKU
+                                                <input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770...">
+                                            </label>
+                                            <label>Nombre del producto
+                                                <input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto">
+                                            </label>
+                                        </div>
+                                        <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">✕</button>
+                                    </div>
+                                    <div class="mm-pedido-prod-card-row3">
+                                        <label>Cantidad
+                                            <input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0">
+                                        </label>
+                                        <label>Costo (privado)
+                                            <input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="$">
+                                        </label>
+                                        <label>Precio (privado)
+                                            <input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="$">
+                                        </label>
+                                    </div>
+                                    <label style="margin-top:6px; display:block;">Observación
+                                        <input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, referencia, nota">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="button" class="mm-mini-secondary mm-add-pedido-product-row" style="margin-top:8px;">+ Agregar producto</button>
 
                             <input type="hidden" name="productos_pedido" value="">
-                            <div class="mm-safe-note mm-pedido-private-price-note">
+                            <div class="mm-safe-note mm-pedido-private-price-note" style="margin-top:10px;">
                                 <strong>Privado para administración:</strong>
                                 <p>Los campos de costo y precio quedan guardados para control interno, pero no se muestran en Bodega. La imagen es opcional; si un producto queda sin foto aparecerá como pendiente de imagen.</p>
                             </div>
                         </div>
+
 
                         <label class="mm-check-row">
                             <input type="checkbox" name="crear_lote" value="1">

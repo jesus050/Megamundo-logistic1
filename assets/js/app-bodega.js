@@ -1352,45 +1352,92 @@ document.querySelectorAll('.mm-btn-pedido-cerrar').forEach(function (btn) {
 });
 
 document.querySelectorAll('.mm-pedido-productos-panel').forEach(function (panel) {
-    const rows = panel.querySelector('.mm-pedido-productos-rows');
-    const addBtn = panel.querySelector('.mm-add-pedido-product-row');
+    const tableRows  = panel.querySelector('.mm-pedido-productos-rows');
+    const cardsWrap  = panel.querySelector('.mm-pedido-productos-cards');
+    const addBtn     = panel.querySelector('.mm-add-pedido-product-row');
 
-    function getRowHtml() {
-        return `
-            <tr>
-                <td><input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770..."></td>
-                <td><input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto"></td>
-                <td><input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0"></td>
-                <td><input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="Privado"></td>
-                <td><input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="Privado"></td>
-                <td><input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, referencia, nota"></td>
-                <td class="mm-pedido-image-cell"><input class="mm-input mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="mm-pedido-image-preview">Sin imagen</div></td>
-                <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">Eliminar</button></td>
-            </tr>
-        `;
+    /* ── Plantilla fila de tabla (desktop) ──────────────────────── */
+    function getTableRowHtml() {
+        return `<tr>
+            <td><input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770..."></td>
+            <td><input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto"></td>
+            <td><input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0" style="width:60px;"></td>
+            <td><input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="$" style="width:80px;"></td>
+            <td><input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="$" style="width:80px;"></td>
+            <td><input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, ref\u2026"></td>
+            <td class="mm-pedido-image-cell">
+                <label class="mm-img-upload-label" title="Subir foto del producto">
+                    <span class="mm-img-icon">📷</span><span>Foto</span>
+                    <input class="mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment">
+                </label>
+                <img class="mm-pedido-image-preview" src="" alt="Vista previa">
+            </td>
+            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">\u2715</button></td>
+        </tr>`;
     }
 
-    if (addBtn && rows) {
+    /* ── Plantilla tarjeta (móvil) ──────────────────────────────── */
+    function getCardHtml() {
+        return `<div class="mm-pedido-prod-card">
+            <div class="mm-pedido-prod-card-header">
+                <div class="mm-pedido-prod-card-img">
+                    <label class="mm-img-upload-label" title="Subir foto">
+                        <span class="mm-img-icon">📷</span><span>Foto</span>
+                        <input class="mm-pedido-product-image-input" type="file" name="pedido_producto_imagen[]" accept="image/jpeg,image/png,image/webp" capture="environment">
+                    </label>
+                    <img class="mm-pedido-image-preview" src="" alt="Vista previa">
+                </div>
+                <div class="mm-pedido-prod-card-fields">
+                    <label>Código / SKU<input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770..."></label>
+                    <label>Nombre<input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto"></label>
+                </div>
+                <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">\u2715</button>
+            </div>
+            <div class="mm-pedido-prod-card-row3">
+                <label>Cantidad<input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0"></label>
+                <label>Costo<input class="mm-input" type="number" name="pedido_producto_costo[]" min="0" step="1" placeholder="$"></label>
+                <label>Precio<input class="mm-input" type="number" name="pedido_producto_precio[]" min="0" step="1" placeholder="$"></label>
+            </div>
+            <label style="margin-top:6px;display:block;">Observación<input class="mm-input" type="text" name="pedido_producto_observacion[]" placeholder="Color, referencia, nota"></label>
+        </div>`;
+    }
+
+    /* ── Botón "+ Agregar producto" ─────────────────────────────── */
+    if (addBtn) {
         addBtn.addEventListener('click', function () {
-            rows.insertAdjacentHTML('beforeend', getRowHtml());
+            if (tableRows) tableRows.insertAdjacentHTML('beforeend', getTableRowHtml());
+            if (cardsWrap) cardsWrap.insertAdjacentHTML('beforeend', getCardHtml());
         });
     }
 
+    /* ── Eliminar fila/tarjeta ──────────────────────────────────── */
     panel.addEventListener('click', function (event) {
         const removeBtn = event.target.closest('.mm-remove-pedido-product-row');
-        if (!removeBtn || !rows) return;
+        if (!removeBtn) return;
 
-        const allRows = rows.querySelectorAll('tr');
-        if (allRows.length <= 1) {
-            const row = removeBtn.closest('tr');
-            if (row) {
-                row.querySelectorAll('input').forEach(function (input) { input.value = ''; });
+        /* Tarjeta móvil */
+        const card = removeBtn.closest('.mm-pedido-prod-card');
+        if (card) {
+            const allCards = cardsWrap ? cardsWrap.querySelectorAll('.mm-pedido-prod-card') : [];
+            if (allCards.length <= 1) {
+                card.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+            } else {
+                card.remove();
             }
-            return;
         }
 
-        const row = removeBtn.closest('tr');
-        if (row) row.remove();
+        /* Fila de tabla desktop */
+        if (tableRows) {
+            const row = removeBtn.closest('tr');
+            if (row) {
+                const allRows = tableRows.querySelectorAll('tr');
+                if (allRows.length <= 1) {
+                    row.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+                } else {
+                    row.remove();
+                }
+            }
+        }
     });
 });
 
@@ -1793,28 +1840,35 @@ document.querySelectorAll('.mm-resolver-producto-sin-imagen').forEach(function(b
 })();
 
 
-function mmUpdatePedidoImagePreview(input) {
-    const cell = input.closest('.mm-pedido-image-cell');
-    if (!cell) return;
-    const preview = cell.querySelector('.mm-pedido-image-preview');
-    if (!preview) return;
-
-    if (!input.files || !input.files[0]) {
-        preview.textContent = 'Sin imagen';
-        preview.classList.remove('has-image');
-        preview.style.backgroundImage = '';
-        return;
-    }
-
-    const file = input.files[0];
-    const url = URL.createObjectURL(file);
-    preview.textContent = '';
-    preview.classList.add('has-image');
-    preview.style.backgroundImage = 'url("' + url + '")';
-}
-
-document.addEventListener('change', function(e){
+/* ── Preview de foto del producto (tabla desktop + tarjetas móvil) ─── */
+document.addEventListener('change', function(e) {
     const input = e.target.closest('.mm-pedido-product-image-input');
     if (!input) return;
-    mmUpdatePedidoImagePreview(input);
+
+    const file = input.files && input.files[0];
+
+    /* Buscar el label padre (contiene la etiqueta y el img de preview en la nueva estructura) */
+    const label  = input.closest('.mm-img-upload-label');
+    const cell   = input.closest('.mm-pedido-image-cell, .mm-pedido-prod-card-img');
+    const imgEl  = cell ? cell.querySelector('img.mm-pedido-image-preview') : null;
+
+    if (file) {
+        const url = URL.createObjectURL(file);
+
+        /* Nueva estructura: <img> */
+        if (imgEl) {
+            imgEl.src = url;
+            imgEl.classList.add('has-image');
+            imgEl.style.display = 'block';
+            if (label) { label.style.display = 'none'; }  /* ocultar el drop-zone, mostrar foto */
+        }
+    } else {
+        if (imgEl) {
+            imgEl.src = '';
+            imgEl.classList.remove('has-image');
+            imgEl.style.display = '';
+            if (label) { label.style.display = ''; }
+        }
+    }
 });
+
