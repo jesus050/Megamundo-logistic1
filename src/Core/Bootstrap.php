@@ -31,6 +31,9 @@ use MegaMundo\Logistica\Application\Export\MekanoExportService;
 use MegaMundo\Logistica\Application\Pricing\PriceSuggestionService;
 use MegaMundo\Logistica\Application\Quality\CountAnomalyDetector;
 use MegaMundo\Logistica\Application\Integration\WebhookDispatcher;
+use MegaMundo\Logistica\Domain\Inventory\UbicacionRepository;
+use MegaMundo\Logistica\Domain\Inventory\EquivalenciaRepository;
+use MegaMundo\Logistica\Domain\Inventory\InventarioFisicoRepository;
 
 class Bootstrap {
 
@@ -124,6 +127,19 @@ class Bootstrap {
             return new WebhookDispatcher();
         } );
 
+        // Módulo Ubicaciones e Inventario Físico
+        self::$container->set( UbicacionRepository::class, function() {
+            return new UbicacionRepository();
+        } );
+
+        self::$container->set( EquivalenciaRepository::class, function() {
+            return new EquivalenciaRepository();
+        } );
+
+        self::$container->set( InventarioFisicoRepository::class, function() {
+            return new InventarioFisicoRepository();
+        } );
+
         // 2. Registrar controladores / servicios de aplicación
         self::$container->set( LotePostType::class, function() {
             return new LotePostType();
@@ -151,7 +167,10 @@ class Bootstrap {
                 $c->get( LoteItemRepository::class ),
                 $c->get( PermissionGuard::class ),
                 $c->get( OpenAiVisionService::class ),
-                $c->get( MekanoExportService::class )
+                $c->get( MekanoExportService::class ),
+                $c->get( UbicacionRepository::class ),
+                $c->get( EquivalenciaRepository::class ),
+                $c->get( InventarioFisicoRepository::class )
             );
         } );
 

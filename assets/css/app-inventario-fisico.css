@@ -1,0 +1,135 @@
+/* MegaMundo — Módulo Ubicaciones e Inventario Físico
+   Reutiliza los tokens de app-bodega.css (--mm-*). Solo añade lo específico:
+   pantalla de conteo tipo app, botones grandes y layout responsive. */
+
+/* --- Conteo físico: campos grandes, paso a paso --- */
+.mm-inv-count-panel .mm-inv-field {
+    display: block;
+    font-weight: 700;
+    color: var(--mm-text);
+    margin-bottom: 14px;
+    font-size: 14px;
+}
+.mm-inv-count-panel .mm-inv-field .mm-input {
+    margin-top: 6px;
+    min-height: 52px;
+    font-size: 18px;
+}
+.mm-inv-sku {
+    font-weight: 800 !important;
+    letter-spacing: .02em;
+}
+
+.mm-inv-count-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.mm-inv-total-box {
+    background: var(--mm-panel-soft);
+    border: 1px dashed var(--mm-border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 16px;
+    color: var(--mm-muted);
+    margin: 4px 0 16px;
+}
+.mm-inv-total-box .mm-inv-total-unidades {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--mm-primary);
+    margin-left: 6px;
+}
+
+.mm-inv-count-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+}
+.mm-inv-count-actions .mm-mini-primary,
+.mm-inv-count-actions .mm-mini-secondary {
+    flex: 1 1 auto;
+    min-height: 56px;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.mm-inv-count-msg {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+.mm-inv-count-msg.is-ok { background: rgba(22,163,74,.12); color: var(--mm-success); }
+.mm-inv-count-msg.is-error { background: rgba(220,38,38,.10); color: var(--mm-danger); }
+
+/* --- Lista de conteos de la sesión (tarjetas) --- */
+.mm-inv-session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.mm-inv-session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--mm-panel);
+    border: 1px solid var(--mm-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+.mm-inv-session-item span {
+    background: var(--mm-panel-soft);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-weight: 800;
+    color: var(--mm-primary);
+    font-size: 13px;
+}
+
+/* --- Formulario de ubicaciones: partes + grid --- */
+.mm-ubicacion-parts {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.mm-ubicacion-parts label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--mm-muted);
+}
+.mm-ubicacion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.mm-ubicacion-grid label,
+.mm-ubicacion-parts label { text-transform: none; }
+.mm-ubicacion-msg,
+.mm-equivalencia-msg {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+.mm-ubicacion-msg.is-ok,
+.mm-equivalencia-msg.is-ok { background: rgba(22,163,74,.12); color: var(--mm-success); }
+.mm-ubicacion-msg.is-error,
+.mm-equivalencia-msg.is-error { background: rgba(220,38,38,.10); color: var(--mm-danger); }
+
+/* --- Responsive: celular --- */
+@media (max-width: 720px) {
+    .mm-ubicacion-parts { grid-template-columns: repeat(2, 1fr); }
+    .mm-ubicacion-grid { grid-template-columns: 1fr; }
+    .mm-inv-count-row { grid-template-columns: 1fr; }
+    .mm-inv-count-actions .mm-mini-primary,
+    .mm-inv-count-actions .mm-mini-secondary { flex: 1 1 100%; }
+}

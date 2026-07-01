@@ -9,6 +9,9 @@ use MegaMundo\Logistica\Infrastructure\Security\PermissionGuard;
 use MegaMundo\Logistica\Application\Lote\ChecklistService;
 use MegaMundo\Logistica\Infrastructure\OpenAI\OpenAiVisionService;
 use MegaMundo\Logistica\Application\Export\MekanoExportService;
+use MegaMundo\Logistica\Domain\Inventory\UbicacionRepository;
+use MegaMundo\Logistica\Domain\Inventory\EquivalenciaRepository;
+use MegaMundo\Logistica\Domain\Inventory\InventarioFisicoRepository;
 
 class ScannerViewController {
     use Concerns\NotificacionesTrait;
@@ -30,25 +33,35 @@ class ScannerViewController {
     use Concerns\JefaturaTrait;
     use Concerns\LoteDetailTrait;
     use Concerns\RotacionTrait;
+    use Concerns\InventarioFisicoTrait;
 
     private $lote_repo;
     private $item_repo;
     private $permission_guard;
     private $openai_service;
     private $mekano_service;
+    private $ubicacion_repo;
+    private $equivalencia_repo;
+    private $inventario_fisico_repo;
 
     public function __construct(
         LoteRepository $lote_repo,
         LoteItemRepository $item_repo = null,
         PermissionGuard $permission_guard = null,
         OpenAiVisionService $openai_service = null,
-        MekanoExportService $mekano_service = null
+        MekanoExportService $mekano_service = null,
+        UbicacionRepository $ubicacion_repo = null,
+        EquivalenciaRepository $equivalencia_repo = null,
+        InventarioFisicoRepository $inventario_fisico_repo = null
     ) {
         $this->lote_repo        = $lote_repo;
         $this->item_repo        = $item_repo;
         $this->permission_guard = $permission_guard ?: new PermissionGuard();
         $this->openai_service   = $openai_service ?: new OpenAiVisionService();
         $this->mekano_service   = $mekano_service ?: new MekanoExportService( $this->lote_repo, $this->item_repo );
+        $this->ubicacion_repo         = $ubicacion_repo ?: new UbicacionRepository();
+        $this->equivalencia_repo      = $equivalencia_repo ?: new EquivalenciaRepository();
+        $this->inventario_fisico_repo = $inventario_fisico_repo ?: new InventarioFisicoRepository();
     }
 
     public function register() {
@@ -91,6 +104,15 @@ class ScannerViewController {
         add_action( 'wp_ajax_mm_app_rotacion_confirmar', array( $this, 'ajax_rotacion_importar_confirmar' ) );
         add_action( 'wp_ajax_mm_app_rotacion_inv_preview', array( $this, 'ajax_rotacion_inv_preview' ) );
         add_action( 'wp_ajax_mm_app_rotacion_inv_confirmar', array( $this, 'ajax_rotacion_inv_confirmar' ) );
+
+        // Módulo Ubicaciones e Inventario Físico
+        add_action( 'wp_ajax_mm_app_guardar_ubicacion', array( $this, 'ajax_guardar_ubicacion' ) );
+        add_action( 'wp_ajax_mm_app_eliminar_ubicacion', array( $this, 'ajax_eliminar_ubicacion' ) );
+        add_action( 'wp_ajax_mm_app_guardar_equivalencia', array( $this, 'ajax_guardar_equivalencia' ) );
+        add_action( 'wp_ajax_mm_app_eliminar_equivalencia', array( $this, 'ajax_eliminar_equivalencia' ) );
+        add_action( 'wp_ajax_mm_app_guardar_conteo', array( $this, 'ajax_guardar_conteo' ) );
+        add_action( 'wp_ajax_mm_app_eliminar_conteo', array( $this, 'ajax_eliminar_conteo' ) );
+        add_action( 'wp_ajax_mm_app_exportar_inventario_fisico', array( $this, 'ajax_exportar_inventario_fisico' ) );
     }
 
     private function plugin_file() {
@@ -134,6 +156,22 @@ class ScannerViewController {
             'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
             'zxingUrl'  => plugins_url( 'assets/vendor/zxing/zxing-browser.min.js', $this->plugin_file() ),
         ) );
+
+        // Módulo Ubicaciones e Inventario Físico
+        wp_enqueue_style(
+            'mm-app-inventario-fisico',
+            plugins_url( 'assets/css/app-inventario-fisico.css', $this->plugin_file() ),
+            array( 'mm-app-bodega' ),
+            MM_LOGISTICA_VERSION
+        );
+
+        wp_enqueue_script(
+            'mm-app-inventario-fisico',
+            plugins_url( 'assets/js/app-inventario-fisico.js', $this->plugin_file() ),
+            array( 'mm-app-bodega' ),
+            MM_LOGISTICA_VERSION,
+            true
+        );
     }
 
     public function render_standalone_app() {
@@ -160,7 +198,7 @@ class ScannerViewController {
             exit;
         }
 
-        if ( ! in_array( $app, array( 'dashboard', 'pedidos', 'bodega', 'exhibicion', 'precios', 'jefatura', 'etiquetas', 'notificaciones', 'reportes', 'reports', 'productos-nuevos', 'sincronizacion', 'usuarios', 'historial', 'sistema', 'facturas', 'mekano', 'rotacion', 'exhibicion'), true ) ) {
+        if ( ! in_array( $app, array( 'dashboard', 'pedidos', 'bodega', 'exhibicion', 'precios', 'jefatura', 'etiquetas', 'notificaciones', 'reportes', 'reports', 'productos-nuevos', 'sincronizacion', 'usuarios', 'historial', 'sistema', 'facturas', 'mekano', 'rotacion', 'exhibicion', 'inventario-fisico', 'ubicaciones', 'equivalencias', 'inventario-contados' ), true ) ) {
             return;
         }
 
@@ -199,6 +237,10 @@ class ScannerViewController {
             'facturas' => 'MegaMundo Logística | Facturas',
             'mekano' => 'MegaMundo Logística | Mekano',
             'rotacion' => 'MegaMundo Logística | Rotación',
+            'inventario-fisico'   => 'MegaMundo Logística | Inventario físico',
+            'ubicaciones'         => 'MegaMundo Logística | Ubicaciones',
+            'equivalencias'       => 'MegaMundo Logística | Equivalencias',
+            'inventario-contados' => 'MegaMundo Logística | Productos contados',
             'bodega'   => 'MegaMundo Bodega | Escáner',
             'exhibicion' => 'MegaMundo Logística | Exhibición',
             'precios'  => 'MegaMundo Precios | Liquidación',
@@ -303,6 +345,22 @@ class ScannerViewController {
                 return $this->render_denied_app( 'No tienes permiso para ver el módulo de rotación.' );
             }
             return $this->render_safe_app_section( 'Rotación', array( $this, 'render_rotacion_dashboard' ) );
+        }
+
+        if ( 'inventario-fisico' === $app ) {
+            return $this->render_safe_app_section( 'Inventario físico', array( $this, 'render_inventario_fisico_dashboard' ) );
+        }
+
+        if ( 'ubicaciones' === $app ) {
+            return $this->render_safe_app_section( 'Ubicaciones', array( $this, 'render_ubicaciones_dashboard' ) );
+        }
+
+        if ( 'equivalencias' === $app ) {
+            return $this->render_safe_app_section( 'Equivalencias', array( $this, 'render_equivalencias_dashboard' ) );
+        }
+
+        if ( 'inventario-contados' === $app ) {
+            return $this->render_safe_app_section( 'Productos contados', array( $this, 'render_inventario_contados_dashboard' ) );
         }
 
         if ( 'dashboard' === $app ) {
@@ -593,6 +651,16 @@ class ScannerViewController {
                 'items'   => array(
                     'pedidos'  => array( 'label' => 'Pedidos', 'icon' => '🛒' ),
                     'facturas' => array( 'label' => 'Facturas', 'icon' => '🧾' ),
+                ),
+            ),
+            'inventario_fisico' => array(
+                'label'   => 'Inventario físico',
+                'visible' => $is_bodega || $is_jefe,
+                'items'   => array(
+                    'inventario-fisico'   => array( 'label' => 'Conteo físico', 'icon' => '🔢' ),
+                    'ubicaciones'         => array( 'label' => 'Ubicaciones', 'icon' => '📍' ),
+                    'equivalencias'       => array( 'label' => 'Equivalencias', 'icon' => '⚖️' ),
+                    'inventario-contados' => array( 'label' => 'Productos contados', 'icon' => '📋' ),
                 ),
             ),
             'precios' => array(

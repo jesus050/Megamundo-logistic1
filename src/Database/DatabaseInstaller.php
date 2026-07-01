@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 class DatabaseInstaller {
 
-    private $db_version = '3.3.0';
+    private $db_version = '3.4.0';
 
     public function get_db_version() {
         return $this->db_version;
@@ -18,6 +18,9 @@ class DatabaseInstaller {
         $table_comments = $wpdb->prefix . 'mm_lote_comments';
         $table_inv      = $wpdb->prefix . 'mm_inventario';
         $table_ventas   = $wpdb->prefix . 'mm_ventas';
+        $table_ubic     = $wpdb->prefix . 'mm_ubicaciones';
+        $table_fisico   = $wpdb->prefix . 'mm_inventario_fisico';
+        $table_equiv    = $wpdb->prefix . 'mm_equivalencias';
         $charset_collate = $wpdb->get_charset_collate();
 
         $sql = "CREATE TABLE $table_name (
@@ -117,14 +120,115 @@ class DatabaseInstaller {
             KEY fecha (fecha)
         ) $charset_collate;";
 
+        // Módulo Ubicaciones e Inventario Físico (apoyo operativo, NO reemplaza a Mekano).
+        // Ubicaciones físicas de bodega: una fila por código de ubicación (UNIQUE en codigo).
+        $sql_ubic = "CREATE TABLE $table_ubic (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            codigo varchar(191) DEFAULT '' NOT NULL,
+            nombre varchar(255) DEFAULT '' NOT NULL,
+            bodega varchar(100) DEFAULT '' NOT NULL,
+            zona varchar(100) DEFAULT '' NOT NULL,
+            pasillo varchar(100) DEFAULT '' NOT NULL,
+            estante varchar(100) DEFAULT '' NOT NULL,
+            nivel varchar(100) DEFAULT '' NOT NULL,
+            posicion varchar(100) DEFAULT '' NOT NULL,
+            categoria varchar(191) DEFAULT '' NOT NULL,
+            estado varchar(20) DEFAULT 'activa' NOT NULL,
+            observacion text DEFAULT NULL,
+            created_by bigint(20) DEFAULT 0 NOT NULL,
+            created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY codigo (codigo),
+            KEY estado (estado),
+            KEY categoria (categoria)
+        ) $charset_collate;";
+
+        // Conteo físico: una fila por conteo de producto en una ubicación.
+        // cantidad_unidades = cantidad * equivalencia (calculado al guardar).
+        $sql_fisico = "CREATE TABLE $table_fisico (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            sku varchar(191) DEFAULT '' NOT NULL,
+            nombre_producto varchar(255) DEFAULT '' NOT NULL,
+            categoria varchar(191) DEFAULT '' NOT NULL,
+            ubicacion_id bigint(20) DEFAULT 0 NOT NULL,
+            cantidad int(11) DEFAULT 0 NOT NULL,
+            presentacion varchar(100) DEFAULT 'unidad' NOT NULL,
+            equivalencia int(11) DEFAULT 1 NOT NULL,
+            cantidad_unidades int(11) DEFAULT 0 NOT NULL,
+            observacion text DEFAULT NULL,
+            estado varchar(20) DEFAULT 'contado' NOT NULL,
+            counted_by bigint(20) DEFAULT 0 NOT NULL,
+            counted_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            PRIMARY KEY  (id),
+            KEY sku (sku),
+            KEY ubicacion_id (ubicacion_id),
+            KEY estado (estado),
+            KEY counted_at (counted_at)
+        ) $charset_collate;";
+
+        // Equivalencias de presentación: unidad, docena, paca, caja, etc.
+        $sql_equiv = "CREATE TABLE $table_equiv (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            nombre varchar(100) DEFAULT '' NOT NULL,
+            unidades int(11) DEFAULT 1 NOT NULL,
+            estado varchar(20) DEFAULT 'activo' NOT NULL,
+            created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY nombre (nombre),
+            KEY estado (estado)
+        ) $charset_collate;";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
         dbDelta( $sql_audit );
         dbDelta( $sql_comments );
         dbDelta( $sql_inv );
         dbDelta( $sql_ventas );
+        dbDelta( $sql_ubic );
+        dbDelta( $sql_fisico );
+        dbDelta( $sql_equiv );
+
+        $this->seed_equivalencias( $table_equiv );
 
         update_option( 'mm_logistica_db_version', $this->db_version );
+    }
+
+    /**
+     * Semilla de equivalencias base solo si la tabla está vacía.
+     * No sobrescribe valores que el usuario ya haya ajustado.
+     */
+    private function seed_equivalencias( $table_equiv ) {
+        global $wpdb;
+
+        $count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table_equiv" );
+        if ( $count > 0 ) {
+            return;
+        }
+
+        $now = current_time( 'mysql' );
+        $defaults = array(
+            array( 'unidad', 1 ),
+            array( 'docena', 12 ),
+            array( 'paca', 50 ),
+            array( 'caja', 144 ),
+        );
+
+        foreach ( $defaults as $row ) {
+            $wpdb->insert(
+                $table_equiv,
+                array(
+                    'nombre'     => $row[0],
+                    'unidades'   => $row[1],
+                    'estado'     => 'activo',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ),
+                array( '%s', '%d', '%s', '%s', '%s' )
+            );
+        }
     }
 
     public function maybe_update() {
