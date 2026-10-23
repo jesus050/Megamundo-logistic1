@@ -1,0 +1,3 @@
+## 2024-10-23 - Icon-only buttons lacking ARIA labels
+**Learning:** Found multiple instances of icon-only buttons (like `✕` for closing modals/removing rows) that are missing ARIA labels across the application, significantly impacting screen reader users. The application is entirely in Spanish, so all added accessibility attributes must also be in localized Spanish (e.g., `aria-label="Cerrar cámara"`).
+**Action:** Always verify that newly added or modified icon-only buttons include descriptive `aria-label` attributes in Spanish to ensure accessibility. Check for similar patterns across the codebase (e.g. `src/Presentation/Front/*`) when making UX improvements.
