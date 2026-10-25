@@ -1372,7 +1372,7 @@ document.querySelectorAll('.mm-pedido-productos-panel').forEach(function (panel)
                 </label>
                 <img class="mm-pedido-image-preview" src="" alt="Vista previa">
             </td>
-            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">\u2715</button></td>
+            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row" aria-label="Eliminar producto">\u2715</button></td>
         </tr>`;
     }
 
@@ -1391,7 +1391,7 @@ document.querySelectorAll('.mm-pedido-productos-panel').forEach(function (panel)
                     <label>Código / SKU<input class="mm-input" type="text" name="pedido_producto_codigo[]" placeholder="770..."></label>
                     <label>Nombre<input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto"></label>
                 </div>
-                <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">\u2715</button>
+                <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row" aria-label="Eliminar producto">\u2715</button>
             </div>
             <div class="mm-pedido-prod-card-row3">
                 <label>Cantidad<input class="mm-input" type="number" name="pedido_producto_cantidad[]" min="0" step="1" placeholder="0"></label>
