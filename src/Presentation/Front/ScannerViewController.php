@@ -930,7 +930,7 @@ class ScannerViewController {
                 </form>
             </section>
         </main>
-        <div id="mm-camera-modal" class="mm-camera-modal" hidden><div class="mm-camera-box"><div class="mm-card-head"><h2>Escaneo con cámara</h2><button type="button" id="mm-close-camera" class="mm-icon-button">×</button></div><video id="mm-camera-video" playsinline muted></video><p id="mm-camera-help">Apunta la cámara al código. Si tu navegador no lo soporta, escribe el SKU manualmente.</p></div></div>
+        <div id="mm-camera-modal" class="mm-camera-modal" hidden><div class="mm-camera-box"><div class="mm-card-head"><h2>Escaneo con cámara</h2><button type="button" id="mm-close-camera" class="mm-icon-button" aria-label="Cerrar cámara">×</button></div><video id="mm-camera-video" playsinline muted></video><p id="mm-camera-help">Apunta la cámara al código. Si tu navegador no lo soporta, escribe el SKU manualmente.</p></div></div>
         <?php return ob_get_clean();
     }
 }
