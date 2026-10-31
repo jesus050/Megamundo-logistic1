@@ -460,7 +460,7 @@ trait PedidosTrait {
                                                 </label>
                                                 <img class="mm-pedido-image-preview" src="" alt="Vista previa">
                                             </td>
-                                            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">✕</button></td>
+                                            <td><button type="button" class="mm-mini-secondary mm-remove-pedido-product-row" aria-label="Eliminar producto" title="Eliminar producto">✕</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -486,7 +486,7 @@ trait PedidosTrait {
                                                 <input class="mm-input" type="text" name="pedido_producto_nombre[]" placeholder="Nombre del producto">
                                             </label>
                                         </div>
-                                        <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row">✕</button>
+                                        <button type="button" class="mm-mini-secondary mm-remove-pedido-product-row" aria-label="Eliminar producto" title="Eliminar producto">✕</button>
                                     </div>
                                     <div class="mm-pedido-prod-card-row3">
                                         <label>Cantidad
