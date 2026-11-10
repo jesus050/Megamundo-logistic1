@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing ARIA labels on UI element closure buttons
+**Learning:** Found several closure buttons (`<button>✕</button>` or similar) acting only through icons without text, leading to accessibility issues for screen reader users. Specifically, these were found in modals (`ScannerViewController.php`) and table rows for data elimination (`PedidosTrait.php`).
+**Action:** Always verify that 'icon-only' or 'symbol-only' buttons (like '✕') have proper descriptive `aria-label` attributes (e.g. `aria-label="Cerrar cámara"` or `aria-label="Eliminar producto"`) to ensure the action is apparent to assistive technologies.
